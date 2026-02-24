@@ -1,75 +1,47 @@
-// ══════════════════════════════════════════════════════════════
-// HIPL Tracker v3 — Service Worker
-// Provides offline caching and background sync capability.
-// ══════════════════════════════════════════════════════════════
+// HIPL Tracker v2 — Service Worker
+const CACHE = 'hipl-v2';
+const ASSETS = ['./', './index.html', './manifest.json'];
 
-const CACHE_NAME = 'hipl-v4';
-
-// Files to pre-cache on install (the full app shell)
-const PRECACHE = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-// ── Install: cache the app shell ──
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE))
-  );
-  self.skipWaiting(); // become active immediately
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
 });
 
-// ── Activate: remove stale caches from previous versions ──
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim(); // take control of all open tabs
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ));
+  self.clients.claim();
 });
 
-// ── Fetch: network-first for POST (API calls), cache-first for assets ──
-self.addEventListener('fetch', event => {
-
-  // POST requests (Google Apps Script submissions) — always try network
-  if (event.request.method === 'POST') {
-    event.respondWith(
-      fetch(event.request).catch(() =>
-        new Response(
-          JSON.stringify({ status: 'queued', message: 'Saved for sync' }),
-          { headers: { 'Content-Type': 'application/json' } }
-        )
+self.addEventListener('fetch', e => {
+  if (e.request.method === 'POST') {
+    e.respondWith(
+      fetch(e.request).catch(() =>
+        new Response(JSON.stringify({status:'queued'}), {headers:{'Content-Type':'application/json'}})
       )
     );
     return;
   }
-
-  // GET requests — cache-first, fallback to network, then to index.html
-  event.respondWith(
-    caches.match(event.request).then(cached => {
+  e.respondWith(
+    caches.match(e.request).then(cached => {
       if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cache successful responses
-        if (response && response.status === 200) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+      return fetch(e.request).then(res => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
         }
-        return response;
+        return res;
       }).catch(() => caches.match('./index.html'));
     })
   );
 });
 
-// ── Background Sync — notifies the page to flush its offline queue ──
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-hipl') {
-    event.waitUntil(
+self.addEventListener('sync', e => {
+  if (e.tag === 'sync-hipl') {
+    e.waitUntil(
       self.clients.matchAll().then(clients =>
-        clients.forEach(client => client.postMessage({ type: 'SYNC_NOW' }))
+        clients.forEach(c => c.postMessage({type:'SYNC_NOW'}))
       )
     );
   }
