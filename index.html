@@ -3,169 +3,125 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <!--
-    ═══════════════════════════════════════════════════════════════
-    HIPL PRODUCTION & DISPATCH TRACKER  ·  v3
-    Helix Industries Private Limited
-    ───────────────────────────────────────────────────────────────
-    PWA — works offline, installable on phone home screen.
-    Multi-entry batch UI — add many rows, submit once.
-    Syncs to Google Sheets via Apps Script Web App (no-cors POST).
-    ═══════════════════════════════════════════════════════════════
-  -->
-  <meta name="theme-color" content="#111923"/>
+  <meta name="theme-color" content="#1A2332"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="description" content="Helix Industries Production & Dispatch Tracker"/>
   <link rel="manifest" href="manifest.json"/>
-  <title>HIPL · Production &amp; Dispatch</title>
-
-  <!-- Google Fonts -->
+  <title>HIPL · Production & Dispatch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800;900&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
   <style>
-    /* ═══════════════════════════════════════════════════════════
-       CSS CUSTOM PROPERTIES — single source of truth for theming
-       Colours derived from the Helix Industries logo palette.
-       ═══════════════════════════════════════════════════════════ */
     :root {
-      /* Brand */
       --gold:        #F5A623;
-      --gold-dark:   #C4841A;
-      --gold-dim:    rgba(245,166,35,0.13);
+      --gold-light:  #FFD06B;
+      --gold-dim:    rgba(245,166,35,0.15);
       --gold-border: rgba(245,166,35,0.28);
-
-      /* Slate palette (logo dark tones) */
-      --slate-900:  #111923;
-      --slate-800:  #1A2332;
-      --slate-700:  #243044;
-      --slate-600:  #2D3B52;
-      --slate-500:  #3D4F63;
-
-      /* Text */
-      --white:     #FFFFFF;
-      --text-mid:  rgba(255,255,255,0.70);
-      --text-dim:  rgba(255,255,255,0.40);
-
-      /* Surfaces */
-      --surface:   rgba(255,255,255,0.05);
-      --border:    rgba(255,255,255,0.07);
-      --border-md: rgba(255,255,255,0.13);
-
-      /* Semantic colours */
-      --green:     #38A169;
-      --green-dim: rgba(56,161,105,0.11);
-      --green-bdr: rgba(56,161,105,0.24);
-      --red:       #E53E3E;
-      --red-dim:   rgba(229,62,62,0.09);
-      --red-bdr:   rgba(229,62,62,0.22);
-
-      /* Shape */
-      --r:    10px;
-      --r-sm:  7px;
+      --slate-900:   #111923;
+      --slate-800:   #1A2332;
+      --slate-700:   #243044;
+      --slate-600:   #2D3B52;
+      --slate-500:   #3D4F63;
+      --slate-400:   #536070;
+      --white:       #FFFFFF;
+      --off:         rgba(255,255,255,0.06);
+      --border:      rgba(255,255,255,0.07);
+      --border-md:   rgba(255,255,255,0.12);
+      --text-dim:    rgba(255,255,255,0.45);
+      --text-mid:    rgba(255,255,255,0.7);
+      --green:       #38A169;
+      --green-dim:   rgba(56,161,105,0.12);
+      --green-bdr:   rgba(56,161,105,0.25);
+      --red:         #E53E3E;
+      --red-dim:     rgba(229,62,62,0.1);
+      --red-bdr:     rgba(229,62,62,0.22);
+      --r:           10px;
+      --r-sm:        7px;
     }
 
-    /* ── Reset ── */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior:smooth; -webkit-tap-highlight-color:transparent; }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family:'Barlow', sans-serif;
-      background:var(--slate-800);
-      color:var(--white);
-      min-height:100vh;
-      overflow-x:hidden;
+      font-family: 'Barlow', sans-serif;
+      background: var(--slate-800);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Subtle diagonal grid texture overlay */
+    /* ── TEXTURE LAYER ── */
     body::before {
-      content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+      content:'';
+      position:fixed; inset:0; pointer-events:none; z-index:0;
       background:
-        radial-gradient(ellipse 65% 55% at 4% 2%,   rgba(245,166,35,0.07) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 55% at 96% 98%,  rgba(17,25,35,0.95)  0%, transparent 65%),
-        repeating-linear-gradient(135deg, transparent 0, transparent 46px,rgba(255,255,255,0.011) 46px,rgba(255,255,255,0.011) 47px),
-        repeating-linear-gradient(45deg,  transparent 0, transparent 46px,rgba(255,255,255,0.007) 46px,rgba(255,255,255,0.007) 47px);
+        radial-gradient(ellipse 60% 50% at 5% 0%,   rgba(245,166,35,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 95% 100%, rgba(17,25,35,0.9)   0%, transparent 70%),
+        repeating-linear-gradient(135deg, transparent 0, transparent 48px, rgba(255,255,255,0.013) 48px, rgba(255,255,255,0.013) 49px),
+        repeating-linear-gradient(45deg,  transparent 0, transparent 48px, rgba(255,255,255,0.008) 48px, rgba(255,255,255,0.008) 49px);
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       STICKY HEADER
-       ═══════════════════════════════════════════════════════════ */
+    /* ── HEADER ── */
     .hdr {
-      position:sticky; top:0; z-index:200;
-      background:rgba(17,25,35,0.93);
-      backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
-      border-bottom:1px solid var(--border);
+      position: sticky; top:0; z-index:200;
+      background: rgba(17,25,35,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
     }
     .hdr-inner {
-      max-width:900px; margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:0 20px; height:62px;
+      max-width: 860px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 62px;
     }
-
-    /* Logo: 2×2 grid recreating the Helix H-block mark */
-    .logo { display:flex; align-items:center; gap:13px; }
+    .logo { display:flex; align-items:center; gap:12px; }
     .logo-mark {
       width:38px; height:38px; flex-shrink:0;
       display:grid; grid-template-columns:1fr 1fr; gap:3px;
     }
     .lm-tl { background:var(--slate-600); border-radius:2px 0 0 0; }
-    .lm-tr { background:var(--gold); border-radius:0 2px 0 0; position:relative; overflow:hidden; }
-    .lm-tr::after { /* diagonal cut on gold cell */
-      content:''; position:absolute; bottom:0; right:0;
-      border-style:solid; border-width:0 0 11px 11px;
-      border-color:transparent transparent var(--slate-800) transparent;
-    }
+    .lm-tr { background:var(--gold);      border-radius:0 2px 0 0; position:relative; overflow:hidden; }
+    .lm-tr::after { content:''; position:absolute; bottom:0; right:0; width:0; height:0; border-style:solid; border-width:0 0 12px 12px; border-color:transparent transparent var(--slate-800) transparent; }
     .lm-bl { background:var(--gold);      border-radius:0 0 0 2px; }
     .lm-br { background:var(--slate-600); border-radius:0 0 2px 0; }
     .logo-words h1 {
       font-family:'Barlow Condensed',sans-serif;
-      font-size:19px; font-weight:800; letter-spacing:3.5px; text-transform:uppercase;
+      font-size:19px; font-weight:800;
+      letter-spacing:3.5px; text-transform:uppercase;
       color:var(--white); line-height:1;
     }
     .logo-words p {
       font-size:9px; letter-spacing:2.5px; text-transform:uppercase;
       color:var(--gold); font-weight:600; margin-top:3px;
     }
-
-    /* Header right: live entry count pill + product badge */
-    .hdr-right { display:flex; align-items:center; gap:8px; }
-    .count-pill {
-      display:none; /* JS shows this when entries > 0 */
-      background:var(--gold-dim); border:1px solid var(--gold-border);
-      color:var(--gold); font-family:'Barlow Condensed',sans-serif;
-      font-size:11px; font-weight:800; letter-spacing:1px;
-      padding:4px 11px; border-radius:20px; white-space:nowrap;
-    }
-    .count-pill.show { display:block; }
     .hdr-pill {
-      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+      background:linear-gradient(135deg,var(--gold),#C4841A);
       color:var(--slate-900);
       font-family:'Barlow Condensed',sans-serif;
-      font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase;
+      font-size:10px; font-weight:800;
+      letter-spacing:2px; text-transform:uppercase;
       padding:5px 12px; border-radius:20px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       LAYOUT
-       ═══════════════════════════════════════════════════════════ */
+    /* ── LAYOUT ── */
     main {
       position:relative; z-index:1;
-      max-width:900px; margin:0 auto;
-      padding:26px 18px 120px;
+      max-width:860px; margin:0 auto;
+      padding:28px 18px 100px;
     }
 
-    /* Page heading */
-    .pg-head { margin-bottom:22px; }
+    /* ── PAGE HEADING ── */
+    .pg-head { margin-bottom:24px; }
     .pg-head h2 {
       font-family:'Barlow Condensed',sans-serif;
-      font-size:33px; font-weight:900; line-height:1.05;
+      font-size:34px; font-weight:900;
+      letter-spacing:0.5px; line-height:1.05;
     }
     .pg-head h2 em { color:var(--gold); font-style:normal; }
-    .pg-head p { font-size:13px; color:var(--text-dim); margin-top:5px; font-weight:300; }
+    .pg-head p { font-size:13px; color:var(--text-dim); margin-top:5px; font-weight:300; letter-spacing:0.3px; }
 
-    /* ═══════════════════════════════════════════════════════════
-       OFFLINE BANNER
-       ═══════════════════════════════════════════════════════════ */
+    /* ── OFFLINE BANNER ── */
     .offline-bar {
       display:none; align-items:center; gap:8px;
       background:var(--red-dim); border:1px solid var(--red-bdr);
@@ -174,261 +130,125 @@
     }
     .offline-bar.on { display:flex; }
 
-    /* ═══════════════════════════════════════════════════════════
-       DATE STRIP — batch date shared across all entries
-       ═══════════════════════════════════════════════════════════ */
+    /* ── DATE STRIP ── */
     .date-strip {
-      display:flex; align-items:center;
-      background:linear-gradient(135deg,rgba(245,166,35,0.12),rgba(245,166,35,0.04));
+      display:flex; align-items:center; gap:0;
+      background:linear-gradient(135deg, rgba(245,166,35,0.12), rgba(245,166,35,0.04));
       border:1px solid var(--gold-border);
-      border-radius:var(--r); padding:13px 18px; margin-bottom:22px;
+      border-radius:var(--r); padding:14px 18px;
+      margin-bottom:20px;
     }
-    .date-icon {
+    .date-icon-box {
       width:36px; height:36px; flex-shrink:0;
-      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
-      border-radius:7px; display:flex; align-items:center;
-      justify-content:center; font-size:16px; margin-right:14px;
+      background:linear-gradient(135deg,var(--gold),#C4841A);
+      border-radius:7px; display:flex; align-items:center; justify-content:center;
+      font-size:16px; margin-right:14px;
     }
-    .date-lbl {
-      font-size:10px; letter-spacing:2.5px; text-transform:uppercase;
-      color:var(--gold); font-weight:700; margin-bottom:3px;
-    }
+    .date-lbl { font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:3px; }
     .date-strip input[type="date"] {
       background:transparent; border:none; outline:none;
       font-family:'Barlow Condensed',sans-serif;
       font-size:21px; font-weight:700; color:var(--white);
-      letter-spacing:1px; cursor:pointer; padding:0;
+      letter-spacing:1px; cursor:pointer; padding:0; width:auto;
     }
     input[type="date"]::-webkit-calendar-picker-indicator {
       filter:invert(1) sepia(1) saturate(4) hue-rotate(5deg);
-      cursor:pointer; opacity:0.55; margin-left:8px;
+      cursor:pointer; opacity:0.6; margin-left:8px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       SECTION HEADER above entry cards
-       ═══════════════════════════════════════════════════════════ */
-    .sec-hdr {
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:14px;
+    /* ── CARDS ── */
+    .card {
+      background:var(--off); border:1px solid var(--border);
+      border-radius:var(--r); overflow:hidden; margin-bottom:16px;
     }
-    .sec-hdr-left {
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:12px; font-weight:700; letter-spacing:3px;
-      text-transform:uppercase; color:var(--text-dim);
-      display:flex; align-items:center; gap:8px;
-    }
-    .sec-count {
-      background:var(--gold-dim); border:1px solid var(--gold-border);
-      color:var(--gold); font-family:'Barlow Condensed',sans-serif;
-      font-size:11px; font-weight:800; padding:1px 8px; border-radius:20px;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ENTRY CARDS STACK
-       Each card = one row of material data
-       ═══════════════════════════════════════════════════════════ */
-    #entryCards { display:flex; flex-direction:column; gap:14px; }
-
-    /* Single entry card */
-    .ecard {
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:var(--r);
-      overflow:hidden;
-      animation:fadeIn .22s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(-8px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    /* Error state — red border when validation fails on submit */
-    .ecard.err  { border-color:var(--red-bdr); box-shadow:0 0 0 1px var(--red-bdr); }
-    /* Valid state — green border when all required fields are filled */
-    .ecard.ok   { border-color:var(--green-bdr); }
-
-    /* ── Card Header (click to collapse/expand) ── */
-    .ec-hdr {
-      display:flex; align-items:center; gap:10px;
-      padding:12px 16px;
-      background:rgba(255,255,255,0.022);
+    .card-hdr {
+      padding:13px 18px; background:rgba(255,255,255,0.025);
       border-bottom:1px solid var(--border);
-      cursor:pointer; user-select:none;
-      transition:background .15s;
+      display:flex; align-items:center; gap:10px;
     }
-    .ec-hdr:hover { background:rgba(255,255,255,0.04); }
-
-    /* Gold number badge (1, 2, 3…) */
-    .ec-badge {
-      width:24px; height:24px; flex-shrink:0; border-radius:50%;
-      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Barlow Condensed',sans-serif; font-size:12px;
-      font-weight:900; color:var(--slate-900);
+    .card-num {
+      width:24px; height:24px; flex-shrink:0;
+      background:linear-gradient(135deg,var(--gold),#C4841A);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:12px; font-weight:900; color:var(--slate-900);
     }
-
-    /* Title shown when card is empty/not yet filled */
-    .ec-title {
-      flex:1; font-family:'Barlow Condensed',sans-serif;
-      font-size:14px; font-weight:700; letter-spacing:1.5px;
-      text-transform:uppercase; color:var(--text-mid);
+    .card-hdr h3 {
+      font-family:'Barlow Condensed',sans-serif;
+      font-size:14px; font-weight:700;
+      letter-spacing:2.5px; text-transform:uppercase;
+      color:rgba(255,255,255,0.8);
     }
-    /* Summary shown in place of title when card is populated + collapsed */
-    .ec-summary { flex:1; font-size:13px; color:var(--text-mid); line-height:1.3; }
-    .ec-summary b { color:var(--white); }
-    .ec-summary small { color:var(--text-dim); font-size:11px; }
+    .card-body { padding:18px; }
 
-    /* Small dot: grey = empty, green = valid, red = has error */
-    .ec-dot {
-      width:7px; height:7px; border-radius:50%; flex-shrink:0;
-      background:var(--border-md);
-    }
-    .ecard.ok  .ec-dot { background:var(--green); }
-    .ecard.err .ec-dot { background:var(--red);   }
+    /* ── FORM GRID ── */
+    .fg { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .fg.fg3 { grid-template-columns:1fr 1fr 1fr; }
+    .ff { display:flex; flex-direction:column; gap:6px; }
+    .ff.full { grid-column:1/-1; }
 
-    /* Remove card button (×) */
-    .ec-del {
-      background:none; border:none; cursor:pointer;
-      color:var(--text-dim); font-size:18px; line-height:1;
-      padding:2px 5px; border-radius:4px;
-      transition:color .15s, background .15s;
-    }
-    .ec-del:hover { color:#FC8181; background:var(--red-dim); }
-
-    /* Collapse/expand chevron */
-    .ec-chev {
-      color:var(--text-dim); font-size:11px;
-      transition:transform .2s; flex-shrink:0;
-    }
-    .ecard.collapsed .ec-chev { transform:rotate(-90deg); }
-
-    /* ── Card Body (collapsible) ── */
-    .ec-body { padding:16px; }
-    .ecard.collapsed .ec-body { display:none; }
-
-    /* ── Form grid: 3 cols desktop → 2 cols tablet → 1 col mobile ── */
-    .eg {
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-    /* Field wrapper */
-    .ef { display:flex; flex-direction:column; gap:5px; }
-    .ef.s2 { grid-column:span 2; }
-    .ef.s3 { grid-column:1/-1;  }
-
-    /* Field label */
-    .el {
-      font-size:9.5px; letter-spacing:2px; text-transform:uppercase;
+    .fl {
+      font-size:10px; letter-spacing:2px; text-transform:uppercase;
       font-weight:700; color:var(--text-dim);
       display:flex; align-items:center; gap:3px;
     }
-    .el .req { color:var(--gold); font-size:13px; line-height:1; }
+    .fl .req { color:var(--gold); font-size:13px; line-height:1; }
 
-    /* ── Shared input / select styles ── */
     select, input[type="text"], input[type="number"] {
       width:100%; background:rgba(255,255,255,0.055);
       border:1px solid rgba(255,255,255,0.09);
-      border-radius:var(--r-sm); padding:9px 12px;
+      border-radius:var(--r-sm); padding:10px 13px;
       color:var(--white); font-family:'Barlow',sans-serif;
-      font-size:13px; font-weight:500; outline:none;
+      font-size:14px; font-weight:500; outline:none;
       transition:border-color .18s, box-shadow .18s, background .18s;
       -webkit-appearance:none; appearance:none;
     }
-    /* Gold custom arrow */
     select {
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23F5A623' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:right 10px center;
-      padding-right:32px; cursor:pointer;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23F5A623' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 11px center;
+      padding-right:34px; cursor:pointer;
     }
     select option { background:var(--slate-700); color:var(--white); }
     select:focus, input:focus {
       border-color:var(--gold);
       background:rgba(245,166,35,0.07);
-      box-shadow:0 0 0 3px rgba(245,166,35,0.09);
+      box-shadow:0 0 0 3px rgba(245,166,35,0.1);
     }
-    select.ferr, input.ferr {
-      border-color:var(--red);
-      box-shadow:0 0 0 2px rgba(229,62,62,0.1);
-    }
-    select:disabled { opacity:0.35; cursor:not-allowed; }
-    .ferr-txt { font-size:11px; color:#FC8181; }
+    select.err, input.err { border-color:var(--red); box-shadow:0 0 0 3px rgba(229,62,62,0.1); }
+    select:disabled { opacity:0.38; cursor:not-allowed; }
+    .emsg { font-size:11px; color:#FC8181; }
 
-    /* "Other" text input: hidden until "Other" chosen in dropdown */
-    .other-inp { display:none; margin-top:6px; }
+    .other-input { display:none; margin-top:7px; }
 
-    /* ── Production / Dispatch mini cards ── */
-    .pd-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px; }
-    .pd-box { border-radius:var(--r-sm); padding:12px 14px; }
+    /* ── PROD / DISP ── */
+    .pd-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .pd-box { border-radius:var(--r-sm); padding:15px 16px; }
     .pd-box.prod { background:var(--green-dim); border:1px solid var(--green-bdr); }
     .pd-box.disp { background:var(--red-dim);   border:1px solid var(--red-bdr);   }
-    .pd-box.prod .el  { color:rgba(104,211,145,0.85); }
-    .pd-box.disp .el  { color:rgba(252,129,129,0.85); }
+    .pd-box.prod .fl { color:rgba(104,211,145,0.85); }
+    .pd-box.disp .fl { color:rgba(252,129,129,0.85); }
     .pd-box.prod input { border-color:var(--green-bdr); }
-    .pd-box.disp input { border-color:var(--red-bdr);   }
-    .pd-box.prod input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(56,161,105,0.14); }
-    .pd-box.disp input:focus { border-color:var(--red);   box-shadow:0 0 0 3px rgba(229,62,62,0.1);   }
-    .pd-hint { font-size:11px; margin-top:4px; }
-    .prod .pd-hint { color:rgba(56,161,105,0.5); }
-    .disp .pd-hint { color:rgba(229,62,62,0.4);  }
+    .pd-box.disp input { border-color:var(--red-bdr); }
+    .pd-box.prod input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(56,161,105,0.15); }
+    .pd-box.disp input:focus { border-color:var(--red);   box-shadow:0 0 0 3px rgba(229,62,62,0.12); }
+    .pd-hint { font-size:11px; margin-top:5px; }
+    .prod .pd-hint { color:rgba(56,161,105,0.55); }
+    .disp .pd-hint { color:rgba(229,62,62,0.45);  }
 
-    /* ── Sq. Ft. / Sq. Mtr. conversion preview ── */
-    .conv-box {
-      display:none; /* shown by JS when factor exists and qty > 0 */
+    /* ── CONVERSION PREVIEW ── */
+    .conv-preview {
+      display:none; margin-top:12px;
       background:rgba(245,166,35,0.07); border:1px solid var(--gold-border);
-      border-radius:var(--r-sm); padding:9px 13px;
-      font-size:12px; color:var(--gold); line-height:1.65;
+      border-radius:var(--r-sm); padding:10px 14px;
+      font-size:12px; color:var(--gold); letter-spacing:0.3px;
+      line-height:1.6;
     }
-    .conv-box.show { display:block; }
+    .conv-preview.show { display:block; }
 
-    /* ═══════════════════════════════════════════════════════════
-       ADD ENTRY BUTTON — dashed call-to-action below cards
-       ═══════════════════════════════════════════════════════════ */
-    .add-btn {
-      width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
-      padding:14px; background:transparent;
-      border:2px dashed rgba(245,166,35,0.28); border-radius:var(--r);
-      color:var(--gold); cursor:pointer;
-      font-family:'Barlow Condensed',sans-serif; font-size:14px;
-      font-weight:700; letter-spacing:2px; text-transform:uppercase;
-      transition:background .18s, border-color .18s;
-      margin-top:4px;
-    }
-    .add-btn:hover { background:var(--gold-dim); border-color:rgba(245,166,35,0.5); }
-    .add-btn .plus {
-      width:26px; height:26px; border-radius:50%;
-      background:var(--gold-dim); border:1px solid var(--gold-border);
-      display:flex; align-items:center; justify-content:center;
-      font-size:18px; line-height:1;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       BATCH SUMMARY BAR
-       Shows "X entries ready · Total Prod Y pcs · Total Disp Z pcs"
-       ═══════════════════════════════════════════════════════════ */
-    .batch-bar {
-      display:none; /* shown by JS when ≥1 valid entry exists */
-      align-items:center; gap:14px;
-      background:var(--gold-dim); border:1px solid var(--gold-border);
-      border-radius:var(--r); padding:14px 18px; margin-top:18px;
-    }
-    .batch-bar.show { display:flex; }
-    .bb-icon { font-size:20px; flex-shrink:0; }
-    .bb-text { flex:1; }
-    .bb-text strong {
-      font-family:'Barlow Condensed',sans-serif;
-      font-size:16px; font-weight:800; color:var(--gold); display:block;
-    }
-    .bb-text span { font-size:12px; color:var(--text-dim); }
-
-    /* ═══════════════════════════════════════════════════════════
-       ACTION ROW
-       ═══════════════════════════════════════════════════════════ */
-    .actions { display:flex; gap:10px; margin-top:14px; }
-
-    /* Primary CTA — gold gradient */
+    /* ── ACTION ROW ── */
+    .actions { display:flex; gap:10px; margin-top:20px; }
     .btn-primary {
-      flex:1; background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+      flex:1; background:linear-gradient(135deg,var(--gold) 0%,#C4841A 100%);
       border:none; border-radius:var(--r-sm); padding:14px 20px;
       color:var(--slate-900); font-family:'Barlow Condensed',sans-serif;
       font-size:15px; font-weight:900; letter-spacing:2px; text-transform:uppercase;
@@ -441,317 +261,357 @@
       opacity:0; transition:opacity .18s;
     }
     .btn-primary:hover::after { opacity:1; }
-    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(245,166,35,0.28); }
+    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 8px 28px rgba(245,166,35,0.3); }
     .btn-primary:active { transform:translateY(0); }
-    .btn-primary:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
-
-    /* Ghost secondary */
+    .btn-primary:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
     .btn-ghost {
       background:transparent; border:1px solid var(--border-md);
-      border-radius:var(--r-sm); padding:14px 18px; color:var(--text-dim);
-      font-family:'Barlow Condensed',sans-serif; font-size:13px;
-      font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+      border-radius:var(--r-sm); padding:14px 18px;
+      color:var(--text-dim); font-family:'Barlow Condensed',sans-serif;
+      font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
       cursor:pointer; transition:border-color .15s, color .15s;
     }
     .btn-ghost:hover { border-color:var(--border-md); color:var(--text-mid); }
 
-    /* Loading spinner (inside submit button) */
+    /* ── SPINNER ── */
     .spin {
-      display:inline-block; width:13px; height:13px;
+      display:inline-block; width:14px; height:14px;
       border:2px solid rgba(26,35,50,0.3); border-top-color:var(--slate-900);
-      border-radius:50%; animation:rot .6s linear infinite; vertical-align:middle;
+      border-radius:50%; animation:spin .65s linear infinite; vertical-align:middle;
     }
-    @keyframes rot { to { transform:rotate(360deg); } }
+    @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ═══════════════════════════════════════════════════════════
-       SETTINGS — Google Sheets connection
-       ═══════════════════════════════════════════════════════════ */
-    .cfg-wrap { margin-top:20px; }
-    .cfg-toggle {
+    /* ── SETTINGS ── */
+    .settings-wrap { margin-top:16px; }
+    .settings-toggle {
       display:flex; align-items:center; gap:9px;
-      background:var(--surface); border:1px solid var(--border);
+      background:var(--off); border:1px solid var(--border);
       border-radius:var(--r-sm); padding:11px 15px;
       font-size:12px; color:var(--text-dim); cursor:pointer;
-      user-select:none; transition:border-color .15s, color .15s;
+      letter-spacing:0.3px; transition:border-color .15s, color .15s;
+      user-select:none;
     }
-    .cfg-toggle:hover { border-color:var(--border-md); color:var(--text-mid); }
-    .cfg-toggle .arr { font-size:10px; transition:transform .2s; }
-    .cfg-toggle.open .arr { transform:rotate(90deg); }
-    .cfg-panel {
+    .settings-toggle:hover { border-color:var(--border-md); color:var(--text-mid); }
+    .settings-toggle .arr { transition:transform .2s; font-size:10px; }
+    .settings-toggle.open .arr { transform:rotate(90deg); }
+    .settings-panel {
       display:none; flex-direction:column; gap:14px;
-      background:var(--surface); border:1px solid var(--border);
+      background:var(--off); border:1px solid var(--border);
       border-top:none; border-radius:0 0 var(--r-sm) var(--r-sm); padding:18px;
     }
-    .cfg-panel.open { display:flex; }
-    .cfg-panel label {
-      font-size:10px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--text-dim); font-weight:700; display:block; margin-bottom:5px;
-    }
-    .cfg-note { font-size:12px; color:var(--text-dim); line-height:1.75; }
-    .cfg-note strong { color:var(--gold); }
+    .settings-panel.open { display:flex; }
+    .settings-panel label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); font-weight:700; display:block; margin-bottom:5px; }
+    .settings-note { font-size:12px; color:var(--text-dim); line-height:1.7; }
+    .settings-note strong { color:var(--gold); }
     .script-link { color:var(--gold); font-size:12px; text-decoration:underline; cursor:pointer; }
     .btn-save-cfg {
       align-self:flex-start; background:transparent;
       border:1px solid var(--gold-border); border-radius:var(--r-sm);
       padding:9px 18px; color:var(--gold);
-      font-family:'Barlow Condensed',sans-serif; font-size:13px;
-      font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
-      cursor:pointer; transition:background .15s;
+      font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
+      transition:background .15s;
     }
     .btn-save-cfg:hover { background:var(--gold-dim); }
 
-    /* ═══════════════════════════════════════════════════════════
-       RECENT SUBMISSIONS LOG — shows past batches from localStorage
-       ═══════════════════════════════════════════════════════════ */
-    .log-section { margin-top:36px; }
+    /* ── RECENT LOG ── */
+    .log-section { margin-top:32px; }
     .log-title {
       font-family:'Barlow Condensed',sans-serif;
-      font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;
-      color:rgba(255,255,255,0.28);
-      display:flex; align-items:center; gap:10px; margin-bottom:12px;
+      font-size:12px; font-weight:700; letter-spacing:3px;
+      text-transform:uppercase; color:rgba(255,255,255,0.3);
+      margin-bottom:12px; display:flex; align-items:center; gap:10px;
     }
     .log-title::after { content:''; flex:1; height:1px; background:var(--border); }
-    .log-batch {
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:var(--r); overflow:hidden; margin-bottom:10px;
-      animation:fadeIn .22s ease;
-    }
-    .log-batch-hdr {
+    .log-empty { text-align:center; padding:28px; font-size:13px; color:rgba(255,255,255,0.2); }
+    .log-item {
       display:flex; align-items:center; gap:10px;
-      padding:10px 14px; background:rgba(255,255,255,0.022);
-      border-bottom:1px solid var(--border); font-size:12px;
+      background:var(--off); border:1px solid var(--border);
+      border-radius:var(--r-sm); padding:11px 14px; margin-bottom:8px;
+      font-size:13px; animation:fadeUp .25s ease;
     }
-    .lbh-date { font-family:'Barlow Condensed',sans-serif; font-weight:700; color:var(--gold); font-size:13px; }
-    .lbh-count { color:var(--text-dim); }
-    .lbh-time  { margin-left:auto; color:rgba(255,255,255,0.22); font-size:11px; }
-    .log-row {
-      display:flex; align-items:center; gap:10px;
-      padding:9px 14px; border-bottom:1px solid var(--border); font-size:12px;
-    }
-    .log-row:last-child { border-bottom:none; }
-    .log-machine {
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .log-badge {
       background:var(--gold-dim); border:1px solid var(--gold-border);
       color:var(--gold); font-family:'Barlow Condensed',sans-serif;
-      font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase;
-      padding:2px 7px; border-radius:3px; flex-shrink:0;
+      font-size:10px; font-weight:800; letter-spacing:1px;
+      padding:3px 8px; border-radius:4px;
+      white-space:nowrap; text-transform:uppercase; flex-shrink:0;
     }
     .log-info { flex:1; min-width:0; }
-    .log-info b { color:var(--white); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
-    .log-info span { color:var(--text-dim); font-size:11px; }
-    .log-qty { display:flex; gap:7px; flex-shrink:0; }
-    .lqp { color:#68D391; font-weight:700; }
-    .lqd { color:#FC8181; font-weight:700; }
-    .log-empty { text-align:center; padding:28px; font-size:13px; color:rgba(255,255,255,0.2); }
+    .log-info strong { color:var(--white); font-size:13px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .log-info span { font-size:11px; color:var(--text-dim); }
+    .log-nums { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+    .lp { color:#68D391; font-weight:700; font-size:12px; }
+    .ld { color:#FC8181; font-weight:700; font-size:12px; }
+    .log-sep { color:rgba(255,255,255,0.15); font-size:10px; }
+    .log-time { font-size:11px; color:rgba(255,255,255,0.25); white-space:nowrap; flex-shrink:0; }
 
-    /* ═══════════════════════════════════════════════════════════
-       SCRIPT MODAL
-       ═══════════════════════════════════════════════════════════ */
+    /* ── MODAL ── */
     .modal-overlay {
       display:none; position:fixed; inset:0; z-index:500;
-      background:rgba(0,0,0,0.9); backdrop-filter:blur(12px);
+      background:rgba(0,0,0,0.88); backdrop-filter:blur(12px);
       -webkit-backdrop-filter:blur(12px); padding:20px; overflow-y:auto;
     }
     .modal-overlay.open { display:block; }
     .modal-box {
-      max-width:720px; margin:40px auto;
+      max-width:700px; margin:40px auto;
       background:var(--slate-700); border:1px solid var(--border);
       border-radius:var(--r); overflow:hidden;
     }
     .modal-hdr {
-      padding:16px 22px; border-bottom:1px solid var(--border);
+      padding:18px 22px; border-bottom:1px solid var(--border);
       display:flex; justify-content:space-between; align-items:center;
     }
     .modal-hdr h3 { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:800; letter-spacing:1px; }
     .modal-close { background:none; border:none; color:var(--text-dim); font-size:22px; cursor:pointer; line-height:1; }
-    .modal-body  { padding:22px; }
-    .modal-note  { font-size:13px; color:var(--text-dim); margin-bottom:14px; line-height:1.7; }
-    .modal-steps { font-size:13px; color:var(--text-mid); line-height:2; margin-bottom:14px; }
+    .modal-body { padding:22px; }
+    .modal-note { font-size:13px; color:var(--text-dim); margin-bottom:16px; line-height:1.7; }
+    .modal-steps { font-size:13px; color:var(--text-mid); line-height:2; margin-bottom:16px; }
     .modal-steps strong { color:var(--gold); }
     pre#scriptPre {
       background:#0D1117; border:1px solid rgba(255,255,255,0.07);
-      border-radius:8px; padding:16px; font-size:11px;
-      color:#c9d1d9; line-height:1.65; white-space:pre-wrap;
-      max-height:380px; overflow-y:auto;
+      border-radius:8px; padding:16px; font-size:11px; overflow-x:auto;
+      color:#c9d1d9; line-height:1.65; white-space:pre-wrap; max-height:360px; overflow-y:auto;
     }
     .btn-copy {
-      margin-top:12px;
-      background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+      margin-top:12px; background:linear-gradient(135deg,var(--gold),#C4841A);
       border:none; border-radius:8px; padding:10px 20px;
       color:var(--slate-900); font-family:'Barlow Condensed',sans-serif;
-      font-weight:800; letter-spacing:1.5px; font-size:13px; cursor:pointer;
+      font-weight:800; letter-spacing:1.5px; cursor:pointer; font-size:13px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       TOAST NOTIFICATIONS
-       ═══════════════════════════════════════════════════════════ */
+    /* ── TOAST ── */
     .toast-wrap {
       position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
       z-index:999; display:flex; flex-direction:column; align-items:center; gap:8px;
-      pointer-events:none;
     }
     .toast {
       display:flex; align-items:center; gap:9px;
       background:var(--slate-600); border:1px solid var(--border);
       border-radius:40px; padding:11px 20px;
-      font-size:13px; font-weight:500;
-      box-shadow:0 8px 32px rgba(0,0,0,0.5);
-      animation:fadeIn .25s ease; max-width:380px; text-align:center;
-      pointer-events:auto;
+      font-size:13px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      animation:fadeUp .25s ease; max-width:360px; text-align:center;
     }
-    .toast.ok  { background:rgba(56,161,105,0.18);  border-color:rgba(56,161,105,0.35);  }
-    .toast.err { background:rgba(229,62,62,0.15);   border-color:rgba(229,62,62,0.35);   }
-    .toast.inf { background:rgba(245,166,35,0.12);  border-color:rgba(245,166,35,0.3);   }
+    .toast.ok  { background:rgba(56,161,105,0.18); border-color:rgba(56,161,105,0.35); }
+    .toast.err { background:rgba(229,62,62,0.15);  border-color:rgba(229,62,62,0.35);  }
+    .toast.inf { background:rgba(245,166,35,0.12); border-color:rgba(245,166,35,0.3);  }
     .t-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
     .toast.ok  .t-dot { background:var(--green); }
-    .toast.err .t-dot { background:var(--red);   }
+    .toast.err .t-dot { background:var(--red); }
     .toast.inf .t-dot { background:var(--gold); animation:blink 1s infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-    /* ═══════════════════════════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════════════════════════ */
-    @media(max-width:680px) {
-      .eg          { grid-template-columns:1fr 1fr; }
-      .ef.s2       { grid-column:1/-1; }
-    }
-    @media(max-width:440px) {
-      .eg          { grid-template-columns:1fr; }
-      .ef.s2,.ef.s3{ grid-column:auto; }
-      .pd-row      { grid-template-columns:1fr; }
-      .pg-head h2  { font-size:26px; }
-      .hdr-pill    { display:none; }
+    /* ── RESPONSIVE ── */
+    @media(max-width:580px) {
+      .fg, .fg3 { grid-template-columns:1fr; }
+      .pd-grid { grid-template-columns:1fr; }
+      .pg-head h2 { font-size:27px; }
+      .hdr-pill { display:none; }
     }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     HEADER
-     ═══════════════════════════════════════════════════════════════ -->
+<!-- HEADER -->
 <header class="hdr">
   <div class="hdr-inner">
     <div class="logo">
       <div class="logo-mark">
-        <div class="lm-tl"></div><div class="lm-tr"></div>
-        <div class="lm-bl"></div><div class="lm-br"></div>
+        <div class="lm-tl"></div>
+        <div class="lm-tr"></div>
+        <div class="lm-bl"></div>
+        <div class="lm-br"></div>
       </div>
       <div class="logo-words">
         <h1>Helix Industries</h1>
         <p>Quality Redefined</p>
       </div>
     </div>
-    <div class="hdr-right">
-      <!-- Live count: "2/3 ready" — shown when entry cards exist -->
-      <div class="count-pill" id="hdrCount"></div>
-      <div class="hdr-pill">Prod &amp; Dispatch</div>
-    </div>
+    <div class="hdr-pill">Prod &amp; Dispatch</div>
   </div>
 </header>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     MAIN
-     ═══════════════════════════════════════════════════════════════ -->
 <main>
-
   <div class="pg-head">
     <h2>Production &amp; <em>Dispatch</em> Entry</h2>
-    <p>Fill in all entries for the day, then submit everything to Google Sheets at once</p>
+    <p>Log daily manufacturing output and material dispatch — syncs to Google Sheets</p>
   </div>
 
-  <!-- Offline warning -->
   <div class="offline-bar" id="offlineBar">
     <span>⚡</span> You're offline — entries will queue and sync automatically when reconnected.
   </div>
 
-  <!-- Batch date picker — applies to all entries in this batch -->
+  <!-- DATE -->
   <div class="date-strip">
-    <div class="date-icon">📅</div>
+    <div class="date-icon-box">📅</div>
     <div>
-      <div class="date-lbl">Batch Date</div>
-      <input type="date" id="batchDate" onchange="refreshBatchBar()"/>
+      <div class="date-lbl">Entry Date</div>
+      <input type="date" id="entryDate"/>
     </div>
   </div>
 
-  <!-- ── ENTRIES SECTION ── -->
-  <div class="sec-hdr">
-    <div class="sec-hdr-left">
-      Entries
-      <span class="sec-count" id="secCount">0</span>
+  <!-- CARD 1: MATERIAL -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-num">1</div>
+      <h3>Material Identification</h3>
+    </div>
+    <div class="card-body">
+      <div class="fg">
+
+        <!-- Machine -->
+        <div class="ff">
+          <label class="fl">Machine Name <span class="req">*</span></label>
+          <select id="sMachine" onchange="onMachine()">
+            <option value="">— Select Machine —</option>
+            <option value="Apollo">Apollo</option>
+            <option value="Parijatha PBM+">Parijatha PBM+</option>
+            <option value="Rubber Mould">Rubber Mould</option>
+            <option value="Columbia">Columbia</option>
+            <option value="Other">Other</option>
+          </select>
+          <span class="emsg" id="eMachine"></span>
+        </div>
+
+        <!-- Product -->
+        <div class="ff">
+          <label class="fl">Product <span class="req">*</span></label>
+          <select id="sProduct" disabled onchange="onProduct()">
+            <option value="">— Select Machine First —</option>
+          </select>
+          <span class="emsg" id="eProduct"></span>
+        </div>
+
+        <!-- Thickness -->
+        <div class="ff">
+          <label class="fl">Thickness <span class="req">*</span></label>
+          <select id="sThickness" onchange="onThickness()">
+            <option value="">— Select Thickness —</option>
+            <option value="20 MM">20 MM</option>
+            <option value="25 MM">25 MM</option>
+            <option value="30 MM">30 MM</option>
+            <option value="60 MM">60 MM</option>
+            <option value="75 MM">75 MM</option>
+            <option value="80 MM">80 MM</option>
+            <option value="100 MM">100 MM</option>
+            <option value="150 MM">150 MM</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="iThicknessOther" class="other-input" placeholder="Enter thickness value…"/>
+          <span class="emsg" id="eThickness"></span>
+        </div>
+
+        <!-- Grade -->
+        <div class="ff">
+          <label class="fl">Grade</label>
+          <select id="sGrade">
+            <option value="">— None / N/A —</option>
+            <option value="M-7.5">M-7.5</option>
+            <option value="M-12.5">M-12.5</option>
+            <option value="M-25">M-25</option>
+            <option value="M-30">M-30</option>
+            <option value="M-35">M-35</option>
+            <option value="M-40">M-40</option>
+            <option value="M-50">M-50</option>
+          </select>
+        </div>
+
+        <!-- Color -->
+        <div class="ff full">
+          <label class="fl">Color</label>
+          <select id="sColor" onchange="onColor()">
+            <option value="">— Select Color —</option>
+            <option value="Grey">Grey</option>
+            <option value="Dark Grey">Dark Grey</option>
+            <option value="Red">Red</option>
+            <option value="Yellow">Yellow</option>
+            <option value="Chocolate">Chocolate</option>
+            <option value="Orange">Orange</option>
+            <option value="White">White</option>
+            <option value="Blue">Blue</option>
+            <option value="Green">Green</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="iColorOther" class="other-input" placeholder="Enter color name…"/>
+        </div>
+
+      </div><!-- /fg -->
+    </div><!-- /card-body -->
+  </div><!-- /card -->
+
+  <!-- CARD 2: QUANTITIES -->
+  <div class="card">
+    <div class="card-hdr">
+      <div class="card-num">2</div>
+      <h3>Quantities</h3>
+    </div>
+    <div class="card-body">
+      <div class="pd-grid">
+        <div class="pd-box prod">
+          <label class="fl">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Production (Pieces)
+          </label>
+          <input type="number" id="iProd" placeholder="0" min="0" oninput="updateConversion()"/>
+          <div class="pd-hint">Manufactured today</div>
+        </div>
+        <div class="pd-box disp">
+          <label class="fl">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+            Dispatch (Pieces)
+          </label>
+          <input type="number" id="iDisp" placeholder="0" min="0" oninput="updateConversion()"/>
+          <div class="pd-hint">Dispatched today</div>
+        </div>
+      </div>
+
+      <!-- Conversion Preview -->
+      <div class="conv-preview" id="convPreview"></div>
+
     </div>
   </div>
 
-  <!-- Entry cards are injected here by addEntry() -->
-  <div id="entryCards"></div>
-
-  <!-- Add another entry CTA -->
-  <button class="add-btn" onclick="addEntry()">
-    <span class="plus">+</span>
-    Add Another Entry
-  </button>
-
-  <!-- Batch summary bar: appears when ≥1 card is valid -->
-  <div class="batch-bar" id="batchBar">
-    <span class="bb-icon">📋</span>
-    <div class="bb-text">
-      <strong id="bbMain">0 entries ready</strong>
-      <span id="bbDetail"></span>
-    </div>
-  </div>
-
-  <!-- Primary actions -->
-  <div class="actions">
-    <button class="btn-ghost" onclick="clearAll()">✕ Clear All</button>
-    <button class="btn-primary" id="btnSubmit" onclick="submitAll()">
-      Submit All Entries
-    </button>
-  </div>
-
-  <!-- ── SETTINGS ── -->
-  <div class="cfg-wrap">
-    <div class="cfg-toggle" id="cfgToggle" onclick="toggleCfg()">
+  <!-- SETTINGS -->
+  <div class="settings-wrap">
+    <div class="settings-toggle" id="settingsToggle" onclick="toggleSettings()">
       <span class="arr">▶</span>
       <span>⚙ Google Sheets Integration</span>
       <span id="cfgStatus" style="margin-left:auto;font-size:11px;"></span>
     </div>
-    <div class="cfg-panel" id="cfgPanel">
+    <div class="settings-panel" id="settingsPanel">
       <div>
         <label>Google Apps Script Web App URL</label>
-        <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/…/exec"/>
+        <input type="text" id="iScriptUrl" placeholder="https://script.google.com/macros/s/…/exec"/>
       </div>
-
-      <!-- Test result box: shown after clicking Test Connection -->
-      <div id="testResult" style="display:none;border-radius:7px;padding:11px 14px;font-size:12px;line-height:1.7;margin-top:2px;"></div>
-
-      <div class="cfg-note">
+      <div class="settings-note">
         <strong>How to connect:</strong><br>
         1. Open your Google Sheet → Extensions → Apps Script<br>
-        2. Paste the provided script (link below) → Save (💾)<br>
+        2. Paste the provided script (link below) → Save<br>
         3. Deploy → New Deployment → Web App<br>
         &nbsp;&nbsp;&nbsp;· Execute as: <strong>Me</strong><br>
         &nbsp;&nbsp;&nbsp;· Who has access: <strong>Anyone with Google Account</strong><br>
-        4. Paste the Web App URL above → Save Settings → Test Connection.<br><br>
-        ⚠️ <strong>Important:</strong> Every time you edit the script, you must create a
-        <strong>New Deployment</strong> — do not redeploy the same one.<br><br>
+        4. Copy the deployment URL and paste above<br><br>
         <span class="script-link" onclick="openModal()">📋 View &amp; copy the Google Apps Script →</span>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn-save-cfg" onclick="saveSettings()">Save Settings</button>
-        <button class="btn-save-cfg" id="btnTest" onclick="testConnection()" style="border-color:rgba(104,211,145,0.3);color:#68D391;">🔌 Test Connection</button>
-      </div>
+      <button class="btn-save-cfg" onclick="saveSettings()">Save Settings</button>
     </div>
   </div>
 
-  <!-- ── RECENT SUBMISSIONS LOG ── -->
-  <div class="log-section">
-    <div class="log-title">Recent Submissions</div>
-    <div id="logList"></div>
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn-ghost" onclick="resetForm()">↺ Reset</button>
+    <button class="btn-primary" id="btnSubmit" onclick="submitEntry()">Submit Entry</button>
   </div>
 
+  <!-- RECENT LOG -->
+  <div class="log-section">
+    <div class="log-title">Recent Entries</div>
+    <div id="logList"></div>
+  </div>
 </main>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     APPS SCRIPT MODAL
-     ═══════════════════════════════════════════════════════════════ -->
+<!-- SCRIPT MODAL -->
 <div class="modal-overlay" id="scriptModal">
   <div class="modal-box">
     <div class="modal-hdr">
@@ -759,15 +619,10 @@
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <p class="modal-note">
-        Copy this entire script into your Google Sheet's Apps Script editor, then
-        deploy it as a Web App. It handles batch inserts, monthly sheet creation with
-        Opening Stock carry-forward, date column management, and Closing Stock recalculation.
-      </p>
+      <p class="modal-note">Copy this entire script into your Google Sheet's Apps Script editor, then deploy it as a Web App.</p>
       <div class="modal-steps">
-        <strong>Extensions → Apps Script → Paste → Save → Deploy → New Deployment → Web App</strong><br>
-        Execute as: <strong>Me</strong> &nbsp;|&nbsp; Access: <strong>Anyone with Google Account</strong><br>
-        ⚠️ After any edits, always create a <strong>New Deployment</strong> (not redeploy same URL).
+        <strong>Extensions → Apps Script → Paste → Save (💾) → Deploy → New Deployment → Web App</strong><br>
+        Execute as: <strong>Me</strong> &nbsp;|&nbsp; Who has access: <strong>Anyone with Google Account</strong>
       </div>
       <pre id="scriptPre"></pre>
       <button class="btn-copy" onclick="copyScript()">📋 Copy Script to Clipboard</button>
@@ -775,353 +630,125 @@
   </div>
 </div>
 
-<!-- Toast container -->
+<!-- TOASTS -->
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     JAVASCRIPT
-     ═══════════════════════════════════════════════════════════════ -->
 <script>
-'use strict';
+// ═══════════════════════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════
 
-/* ─────────────────────────────────────────────────────────────────
-   STATIC DATA
-   ───────────────────────────────────────────────────────────────── */
-
-/**
- * MACHINE_PRODUCTS
- * Maps each machine name → array of product names.
- * This drives the Product dropdown (populated after Machine is chosen).
- * Add / remove products here to update all dropdowns automatically.
- */
 const MACHINE_PRODUCTS = {
   'Apollo': [
-    'Hexagon', '8x8 Quad', '8x4',
-    'Kerbstone Round', 'Kerbstone Chamfered', 'Kerbstone Bullnose'
+    'Hexagon','8x8 Quad','8x4','Kerbstone Round',
+    'Kerbstone Chamfered','Kerbstone Bullnose'
   ],
   'Parijatha PBM+': [
-    'Hexagon', 'Zigzag', 'I-Shape', '8x4', 'Tricon', 'S-Paver'
+    'Hexagon','Zigzag','I-Shape','8x4','Tricon','S-Paver'
   ],
   'Rubber Mould': [
-    'Jumbo', 'Zigzag', 'Euphrates', 'River Quad', '3D Hexa',
-    'Cobble', '8x4', '4x4', 'Cobble 4.5"', 'X-Block',
-    'Cover Block Big', 'Cover Block Small', '36 Striker',
-    'Cross Strip', 'Matrix', 'Riveira',
-    'BB Bali', 'BB Aruba', 'BB Maui', 'BB Maldives',
-    'BB Ibiza', 'BB Barbados', 'Cool Roof Tile', 'Drain Channel'
+    'Jumbo','Zigzag','Euphrates','River Quad','3D Hexa','Cobble',
+    '8x4','4x4','Cobble 4.5"','X-Block','Cover Block Big',
+    'Cover Block Small','36 Striker','Cross Strip','Matrix','Riveira',
+    'BB Bali','BB Aruba','BB Maui','BB Maldives','BB Ibiza',
+    'BB Barbados','Cool Roof Tile','Drain Channel'
   ],
-  'Columbia': [], // Products to be added when ready
-  'Other':    []
+  'Columbia': [],
+  'Other': []
 };
 
-/**
- * CONV — Sq. Ft. conversion factors (pieces per sq ft).
- * Key format: "Machine|Product"
- * Formula:  sqFt  = pieces / factor
- *           sqMtr = sqFt × 0.092903
- * Products not listed here will leave Sq. Ft. / Sq. Mtr. blank.
- */
+// Conversion: pieces per sq ft — key: "Machine|Product"
+// sqft = pieces / factor
 const CONV = {
-  'Apollo|Hexagon':              2.50,
-  'Apollo|8x8 Quad':             2.25,
-  'Apollo|8x4':                  4.50,
-  'Apollo|Kerbstone Round':      1.00,
-  'Apollo|Kerbstone Chamfered':  1.00,
-  'Apollo|Kerbstone Bullnose':   1.00,
-  'Parijatha PBM+|Hexagon':      2.50,
-  'Parijatha PBM+|Zigzag':       3.50,
-  'Parijatha PBM+|I-Shape':      3.25,
-  'Parijatha PBM+|8x4':          4.50,
-  'Parijatha PBM+|Tricon':       2.90,
-  'Parijatha PBM+|S-Paver':      4.50,
-  'Rubber Mould|Jumbo':          1.80,
-  'Rubber Mould|Zigzag':         2.80,
-  'Rubber Mould|Euphrates':      2.50,
-  'Rubber Mould|River Quad':     2.25,
-  'Rubber Mould|3D Hexa':        2.50,
-  'Rubber Mould|Cobble':         2.25,
-  'Rubber Mould|8x4':            4.50,
-  'Rubber Mould|4x4':            9.00,
-  'Rubber Mould|Cobble 4.5"':    7.11,
-  'Rubber Mould|X-Block':        1.44,
-  'Rubber Mould|36 Striker':     1.00,
-  'Rubber Mould|Cross Strip':    1.00,
-  'Rubber Mould|Matrix':         1.00,
-  'Rubber Mould|BB Bali':        2.25,
-  'Rubber Mould|BB Aruba':       2.25,
-  'Rubber Mould|BB Maui':        2.25,
-  'Rubber Mould|BB Maldives':    2.25,
-  'Rubber Mould|BB Ibiza':       2.25,
-  'Rubber Mould|BB Barbados':    2.25,
-  'Rubber Mould|Cool Roof Tile': 1.00,
-  'Rubber Mould|Drain Channel':  1.00
-  // Cover Block Big / Small / Riveira — no conversion provided
+  'Apollo|Hexagon':             2.50,
+  'Apollo|8x8 Quad':            2.25,
+  'Apollo|8x4':                 4.50,
+  'Apollo|Kerbstone Round':     1.00,
+  'Apollo|Kerbstone Chamfered': 1.00,
+  'Apollo|Kerbstone Bullnose':  1.00,
+  'Parijatha PBM+|Hexagon':     2.50,
+  'Parijatha PBM+|Zigzag':      3.50,
+  'Parijatha PBM+|I-Shape':     3.25,
+  'Parijatha PBM+|8x4':         4.50,
+  'Parijatha PBM+|Tricon':      2.90,
+  'Parijatha PBM+|S-Paver':     4.50,
+  'Rubber Mould|Jumbo':         1.80,
+  'Rubber Mould|Zigzag':        2.80,
+  'Rubber Mould|Euphrates':     2.50,
+  'Rubber Mould|River Quad':    2.25,
+  'Rubber Mould|3D Hexa':       2.50,
+  'Rubber Mould|Cobble':        2.25,
+  'Rubber Mould|8x4':           4.50,
+  'Rubber Mould|4x4':           9.00,
+  'Rubber Mould|Cobble 4.5"':   7.11,
+  'Rubber Mould|X-Block':       1.44,
+  'Rubber Mould|36 Striker':    1.00,
+  'Rubber Mould|Cross Strip':   1.00,
+  'Rubber Mould|Matrix':        1.00,
+  'Rubber Mould|BB Bali':       2.25,
+  'Rubber Mould|BB Aruba':      2.25,
+  'Rubber Mould|BB Maui':       2.25,
+  'Rubber Mould|BB Maldives':   2.25,
+  'Rubber Mould|BB Ibiza':      2.25,
+  'Rubber Mould|BB Barbados':   2.25,
+  'Rubber Mould|Cool Roof Tile':1.00,
+  'Rubber Mould|Drain Channel': 1.00
+  // Cover Block Big, Cover Block Small, Riveira — no conversion factor provided
 };
 
-const SQM_PER_SQFT = 0.092903; // conversion constant
+const SQM_PER_SQFT = 0.092903;
 
-/* ─────────────────────────────────────────────────────────────────
-   STATE
-   All mutable state lives here (no hidden fields / global mutations).
-   ───────────────────────────────────────────────────────────────── */
-let nextId  = 0;  // Auto-incrementing ID assigned to each new entry card
-let entries = []; // Array of { id, valid } — one per visible card
-
-/* ─────────────────────────────────────────────────────────────────
-   INIT
-   ───────────────────────────────────────────────────────────────── */
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-
-  // Pre-fill batch date with today's date
+  // Set today's date
   const t = new Date();
-  document.getElementById('batchDate').value =
-    `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+  document.getElementById('entryDate').value =
+    `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
 
-  // Restore saved Google Script URL
-  const savedUrl = localStorage.getItem('hipl_url') || '';
-  document.getElementById('scriptUrl').value = savedUrl;
+  // Load saved settings
+  const url = localStorage.getItem('hipl_url') || '';
+  document.getElementById('iScriptUrl').value = url;
   updateCfgStatus();
 
-  // Start with one blank entry card
-  addEntry();
-
-  // Load submission history into the log
+  // Render log
   renderLog();
 
-  // Online/offline handlers
+  // Offline detection
   const ob = document.getElementById('offlineBar');
   window.addEventListener('offline', () => ob.classList.add('on'));
   window.addEventListener('online',  () => { ob.classList.remove('on'); syncQueue(); });
   if (!navigator.onLine) ob.classList.add('on');
 
-  // Register service worker for offline caching + background sync
+  // Service worker message (sync trigger)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', e => {
       if (e.data?.type === 'SYNC_NOW') syncQueue();
     });
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
   }
 });
 
-/* ─────────────────────────────────────────────────────────────────
-   UTILITIES
-   ───────────────────────────────────────────────────────────────── */
-const pad  = n => String(n).padStart(2, '0');              // "5" → "05"
-const norm = s => String(s || '').trim().toLowerCase();    // for comparisons
-const $    = id => document.getElementById(id);            // shorthand
-const val  = id => ($(id)?.value || '').trim();            // get trimmed field value
-
-/* Get the card element for a given entry id */
-const card = id => $(`ec-${id}`);
-
-/* ─────────────────────────────────────────────────────────────────
-   ADD ENTRY CARD
-   Creates a new blank card, appends it to the DOM, and collapses
-   all previous cards so focus goes to the new one.
-   ───────────────────────────────────────────────────────────────── */
-function addEntry() {
-  nextId++;
-  const id = nextId;
-  entries.push({ id, valid: false });
-
-  // Inject card HTML into the DOM
-  $('entryCards').insertAdjacentHTML('beforeend', buildCardHTML(id));
-
-  // Collapse all cards except the new one
-  entries.slice(0, -1).forEach(e => collapseCard(e.id));
-
-  // Update counters
-  refreshCounters();
-
-  // Scroll new card into view
-  setTimeout(() => card(id)?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60);
+function updateCfgStatus() {
+  const el = document.getElementById('cfgStatus');
+  const url = localStorage.getItem('hipl_url') || '';
+  el.textContent = url ? '🟢 Connected' : '🔴 Not configured';
+  el.style.color  = url ? '#68D391' : '#FC8181';
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   BUILD CARD HTML
-   Returns a complete HTML string for one entry card with the given id.
-   All element IDs are namespaced with the id (e.g. machine-3, prod-3).
-   ───────────────────────────────────────────────────────────────── */
-function buildCardHTML(id) {
-
-  // ── Option builders ──
-  const machineOpts = Object.keys(MACHINE_PRODUCTS)
-    .map(m => `<option value="${m}">${m}</option>`).join('');
-
-  const thicknessOpts = ['20 MM','25 MM','30 MM','60 MM','75 MM','80 MM','100 MM','150 MM']
-    .map(t => `<option value="${t}">${t}</option>`).join('');
-
-  const gradeOpts = ['M-7.5','M-12.5','M-25','M-30','M-35','M-40','M-50']
-    .map(g => `<option value="${g}">${g}</option>`).join('');
-
-  const colourOpts = ['Grey','Dark Grey','Red','Yellow','Chocolate','Orange','White','Blue','Green']
-    .map(c => `<option value="${c}">${c}</option>`).join('');
-
-  return `
-  <div class="ecard" id="ec-${id}">
-
-    <!-- ── Card Header: number badge, title/summary, status dot, remove btn, chevron ── -->
-    <div class="ec-hdr" onclick="toggleCollapse(${id})">
-      <div class="ec-badge" id="ecb-${id}">${entries.length}</div>
-
-      <!-- Title shown when card is unfilled -->
-      <div class="ec-title" id="ect-${id}">New Entry</div>
-
-      <!-- One-line summary shown when card is collapsed and has data -->
-      <div class="ec-summary" id="ecs-${id}" style="display:none"></div>
-
-      <!-- Validity dot -->
-      <div class="ec-dot" id="ecd-${id}"></div>
-
-      <!-- Chevron (▼ when open, rotated when collapsed) -->
-      <span class="ec-chev">▼</span>
-
-      <!-- Remove this card (stops click-to-collapse from also firing) -->
-      <button class="ec-del" onclick="removeEntry(event,${id})" title="Remove this entry">✕</button>
-    </div>
-
-    <!-- ── Card Body ── -->
-    <div class="ec-body" id="ecbd-${id}">
-
-      <!-- Row 1: Machine · Product · Thickness · Grade · Colour -->
-      <div class="eg">
-
-        <!-- Machine Name (mandatory) -->
-        <div class="ef">
-          <label class="el" for="machine-${id}">Machine <span class="req">*</span></label>
-          <select id="machine-${id}" onchange="onMachine(${id})">
-            <option value="">— Select —</option>
-            ${machineOpts}
-          </select>
-          <span class="ferr-txt" id="fe-machine-${id}"></span>
-        </div>
-
-        <!-- Product (mandatory, populated after Machine chosen) -->
-        <div class="ef">
-          <label class="el" for="product-${id}">Product <span class="req">*</span></label>
-          <select id="product-${id}" disabled onchange="onProduct(${id})">
-            <option value="">— Select Machine First —</option>
-          </select>
-          <span class="ferr-txt" id="fe-product-${id}"></span>
-        </div>
-
-        <!-- Thickness (mandatory) -->
-        <div class="ef">
-          <label class="el" for="thickness-${id}">Thickness <span class="req">*</span></label>
-          <select id="thickness-${id}" onchange="onThickness(${id})">
-            <option value="">— Select —</option>
-            ${thicknessOpts}
-            <option value="Other">Other</option>
-          </select>
-          <!-- Free-text field shown when "Other" is picked -->
-          <input type="text" id="thick-other-${id}" class="other-inp" placeholder="Specify thickness…"/>
-          <span class="ferr-txt" id="fe-thickness-${id}"></span>
-        </div>
-
-        <!-- Grade (optional) -->
-        <div class="ef">
-          <label class="el" for="grade-${id}">Grade</label>
-          <select id="grade-${id}" onchange="onChange(${id})">
-            <option value="">— None / N/A —</option>
-            ${gradeOpts}
-          </select>
-        </div>
-
-        <!-- Colour (optional, spans 2 cols to fill the row) -->
-        <div class="ef s2">
-          <label class="el" for="color-${id}">Colour</label>
-          <select id="color-${id}" onchange="onColor(${id})">
-            <option value="">— Select —</option>
-            ${colourOpts}
-            <option value="Other">Other</option>
-          </select>
-          <!-- Free-text field shown when "Other" is picked -->
-          <input type="text" id="color-other-${id}" class="other-inp" placeholder="Specify colour…"/>
-        </div>
-
-      </div><!-- /eg -->
-
-      <!-- Row 2: Production & Dispatch quantities -->
-      <div class="pd-row">
-
-        <div class="pd-box prod">
-          <label class="el" for="prod-${id}">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
-            </svg>
-            Production (Pieces)
-          </label>
-          <input type="number" id="prod-${id}" placeholder="0" min="0" oninput="onQty(${id})"/>
-          <div class="pd-hint">Manufactured today</div>
-        </div>
-
-        <div class="pd-box disp">
-          <label class="el" for="disp-${id}">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            </svg>
-            Dispatch (Pieces)
-          </label>
-          <input type="number" id="disp-${id}" placeholder="0" min="0" oninput="onQty(${id})"/>
-          <div class="pd-hint">Dispatched today</div>
-        </div>
-
-      </div><!-- /pd-row -->
-
-      <!-- Sq. Ft. / Sq. Mtr. live conversion preview -->
-      <div class="conv-box" id="conv-${id}"></div>
-
-    </div><!-- /ec-body -->
-  </div><!-- /ecard -->`;
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   REMOVE ENTRY
-   Removes the card from DOM and state. Keeps at least 1 card.
-   event.stopPropagation() prevents the header collapse from firing.
-   ───────────────────────────────────────────────────────────────── */
-function removeEntry(event, id) {
-  event.stopPropagation();
-  if (entries.length === 1) { toast('At least one entry row is required.', 'err'); return; }
-  card(id)?.remove();
-  entries = entries.filter(e => e.id !== id);
-  renumber();
-  refreshCounters();
-  refreshBatchBar();
-}
-
-/* Re-number the gold badge (1, 2, 3…) after a removal */
-function renumber() {
-  entries.forEach((e, i) => {
-    const el = $(`ecb-${e.id}`);
-    if (el) el.textContent = i + 1;
-  });
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   COLLAPSE / EXPAND
-   ───────────────────────────────────────────────────────────────── */
-function toggleCollapse(id) { card(id)?.classList.toggle('collapsed'); updateSummary(id); }
-function collapseCard(id)   { card(id)?.classList.add('collapsed');    }
-function expandCard(id)     { card(id)?.classList.remove('collapsed'); }
-
-/* ─────────────────────────────────────────────────────────────────
-   FIELD CHANGE HANDLERS
-   Each handler clears the relevant error, then calls onChange(id)
-   which validates silently and refreshes the card state.
-   ───────────────────────────────────────────────────────────────── */
-
-/** Machine selected → repopulate Product dropdown */
-function onMachine(id) {
-  clearFErr(id, 'machine');
-  const machine = val(`machine-${id}`);
-  const pSel    = $(`product-${id}`);
+// ═══════════════════════════════════════════════════════════════════
+// MACHINE / PRODUCT CASCADE
+// ═══════════════════════════════════════════════════════════════════
+function onMachine() {
+  const machine = document.getElementById('sMachine').value;
+  const sel     = document.getElementById('sProduct');
+  clearErr('eMachine');
+  updateConversion();
 
   if (!machine) {
-    pSel.innerHTML = '<option value="">— Select Machine First —</option>';
-    pSel.disabled  = true;
-    onChange(id);
+    sel.innerHTML = '<option value="">— Select Machine First —</option>';
+    sel.disabled  = true;
     return;
   }
 
@@ -1129,929 +756,506 @@ function onMachine(id) {
   let html = '<option value="">— Select Product —</option>';
   products.forEach(p => { html += `<option value="${p}">${p}</option>`; });
   html += '<option value="__custom__">Other / Custom…</option>';
-  pSel.innerHTML = html;
-  pSel.disabled  = false;
-  onChange(id);
+  sel.innerHTML = html;
+  sel.disabled  = false;
 }
 
-/** Product selected — handle custom entry via browser prompt */
-function onProduct(id) {
-  clearFErr(id, 'product');
-  const sel = $(`product-${id}`);
+function onProduct() {
+  const sel = document.getElementById('sProduct');
+  clearErr('eProduct');
   if (sel.value === '__custom__') {
     const name = prompt('Enter custom product name:');
-    if (name?.trim()) {
+    if (name && name.trim()) {
       const opt = new Option(name.trim(), name.trim(), true, true);
       sel.add(opt); sel.value = name.trim();
     } else { sel.value = ''; }
   }
-  onChange(id);
+  updateConversion();
 }
 
-/** Thickness selected — toggle "Other" text input visibility */
-function onThickness(id) {
-  clearFErr(id, 'thickness');
-  const isOther = val(`thickness-${id}`) === 'Other';
-  $(`thick-other-${id}`).style.display = isOther ? 'block' : 'none';
-  onChange(id);
+function onThickness() {
+  clearErr('eThickness');
+  const v  = document.getElementById('sThickness').value;
+  const el = document.getElementById('iThicknessOther');
+  el.style.display = v === 'Other' ? 'block' : 'none';
 }
 
-/** Colour selected — toggle "Other" text input visibility */
-function onColor(id) {
-  const isOther = val(`color-${id}`) === 'Other';
-  $(`color-other-${id}`).style.display = isOther ? 'block' : 'none';
-  onChange(id);
+function onColor() {
+  const v  = document.getElementById('sColor').value;
+  const el = document.getElementById('iColorOther');
+  el.style.display = v === 'Other' ? 'block' : 'none';
 }
 
-/** Quantity changed — update conversion preview + card state */
-function onQty(id) { updateConversion(id); onChange(id); }
+// ═══════════════════════════════════════════════════════════════════
+// CONVERSION PREVIEW
+// ═══════════════════════════════════════════════════════════════════
+function updateConversion() {
+  const machine = document.getElementById('sMachine').value;
+  const product = document.getElementById('sProduct').value;
+  const prod    = parseFloat(document.getElementById('iProd').value) || 0;
+  const disp    = parseFloat(document.getElementById('iDisp').value) || 0;
+  const preview = document.getElementById('convPreview');
 
-/** Generic change handler: silent validation, summary, counters */
-function onChange(id) {
-  validateCard(id, true); // silent = true: no red error text
-  updateSummary(id);
-  refreshCounters();
-  refreshBatchBar();
-}
+  const key    = `${machine}|${product}`;
+  const factor = CONV[key];
 
-/* ─────────────────────────────────────────────────────────────────
-   CONVERSION PREVIEW
-   Auto-computes Sq. Ft. and Sq. Mtr. using the CONV factors.
-   Shown as a gold info box below the production/dispatch inputs.
-   ───────────────────────────────────────────────────────────────── */
-function updateConversion(id) {
-  const machine = val(`machine-${id}`);
-  const product = val(`product-${id}`);
-  const prod    = parseFloat(val(`prod-${id}`)) || 0;
-  const disp    = parseFloat(val(`disp-${id}`)) || 0;
-  const box     = $(`conv-${id}`);
-  const factor  = CONV[`${machine}|${product}`];
-
-  if (!factor || (!prod && !disp)) { box.classList.remove('show'); return; }
-
-  const pSqft = prod > 0 ? +(prod / factor).toFixed(2) : null;
-  const dSqft = disp > 0 ? +(disp / factor).toFixed(2) : null;
-  const pSqm  = pSqft    ? +(pSqft * SQM_PER_SQFT).toFixed(3) : null;
-  const dSqm  = dSqft    ? +(dSqft * SQM_PER_SQFT).toFixed(3) : null;
-
-  let html = `<strong>📐 Conversion</strong> &nbsp;(${factor} pcs / sq ft)&emsp;`;
-  if (pSqft) html += `Prod: <strong>${pSqft} sq ft</strong> / ${pSqm} sq mtr`;
-  if (pSqft && dSqft) html += `&ensp;·&ensp;`;
-  if (dSqft) html += `Disp: <strong>${dSqft} sq ft</strong> / ${dSqm} sq mtr`;
-
-  box.innerHTML = html;
-  box.classList.add('show');
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   CARD SUMMARY
-   One-line text shown in the collapsed card header.
-   E.g. "Apollo — Hexagon  60 MM · M-35 · Grey  ↑120 ↓80"
-   ───────────────────────────────────────────────────────────────── */
-function updateSummary(id) {
-  const machine = val(`machine-${id}`);
-  const product = val(`product-${id}`);
-  if (!machine || !product) {
-    // Not enough data — show "New Entry" title only
-    $(`ect-${id}`).style.display = '';
-    $(`ecs-${id}`).style.display = 'none';
+  if (!factor || (!prod && !disp)) {
+    preview.classList.remove('show');
     return;
   }
-  const thick = resolveThick(id);
-  const grade = val(`grade-${id}`);
-  const color = resolveColor(id);
-  const prod  = parseFloat(val(`prod-${id}`)) || 0;
-  const disp  = parseFloat(val(`disp-${id}`)) || 0;
-  const meta  = [thick, grade, color].filter(Boolean).join(' · ');
 
-  $(`ect-${id}`).style.display = 'none';
-  $(`ecs-${id}`).style.display = '';
-  $(`ecs-${id}`).innerHTML =
-    `<b>${machine} — ${product}</b> <small>${meta}</small>` +
-    `&ensp;<span class="lqp">↑${prod}</span>&ensp;<span class="lqd">↓${disp}</span>`;
+  const prodSqft = prod > 0 ? (prod / factor).toFixed(2) : null;
+  const dispSqft = disp > 0 ? (disp / factor).toFixed(2) : null;
+  const prodSqm  = prodSqft ? (prodSqft * SQM_PER_SQFT).toFixed(3) : null;
+  const dispSqm  = dispSqft ? (dispSqft * SQM_PER_SQFT).toFixed(3) : null;
+
+  let html = `<strong style="color:var(--gold)">📐 Conversion Preview</strong> &nbsp;(${factor} pcs/sq ft)<br>`;
+  if (prodSqft) html += `Production: ${prod} pcs = <strong>${prodSqft} sq ft</strong> / ${prodSqm} sq mtr&nbsp;&nbsp;`;
+  if (dispSqft) html += `&nbsp;|&nbsp;&nbsp;Dispatch: ${disp} pcs = <strong>${dispSqft} sq ft</strong> / ${dispSqm} sq mtr`;
+
+  preview.innerHTML = html;
+  preview.classList.add('show');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   CARD VALIDATION
-   silent=true: just update the card's visual state (green/red border + dot)
-                without showing inline error messages.
-   silent=false: additionally show red error text under fields.
-   Returns true if card passes all required checks.
-   ───────────────────────────────────────────────────────────────── */
-function validateCard(id, silent = false) {
-  const c       = card(id);
-  const machine = val(`machine-${id}`);
-  const product = val(`product-${id}`);
-  const thick   = val(`thickness-${id}`);
-  const prod    = parseFloat(val(`prod-${id}`)) || 0;
-  const disp    = parseFloat(val(`disp-${id}`)) || 0;
+// ═══════════════════════════════════════════════════════════════════
+// VALIDATION
+// ═══════════════════════════════════════════════════════════════════
+function validate() {
   let ok = true;
-
-  // Required: Machine
-  if (!machine) {
-    if (!silent) setFErr(id, 'machine', 'Required');
-    ok = false;
+  if (!document.getElementById('sMachine').value)  { setErr('eMachine','Machine is required.');   ok=false; }
+  if (!document.getElementById('sProduct').value)  { setErr('eProduct','Product is required.');   ok=false; }
+  const thick = document.getElementById('sThickness').value;
+  if (!thick) { setErr('eThickness','Thickness is required.'); ok=false; }
+  if (thick === 'Other' && !document.getElementById('iThicknessOther').value.trim()) {
+    setErr('eThickness','Please specify the thickness.'); ok=false;
   }
-  // Required: Product
-  if (!product) {
-    if (!silent) setFErr(id, 'product', 'Required');
-    ok = false;
-  }
-  // Required: Thickness (and "Other" value if selected)
-  if (!thick) {
-    if (!silent) setFErr(id, 'thickness', 'Required');
-    ok = false;
-  } else if (thick === 'Other' && !val(`thick-other-${id}`)) {
-    if (!silent) setFErr(id, 'thickness', 'Please specify');
-    ok = false;
-  }
-  // At least one non-zero quantity
-  if (!prod && !disp) ok = false;
-
-  // Update card CSS state
-  if (ok) {
-    c?.classList.remove('err');
-    c?.classList.add('ok');
-  } else {
-    c?.classList.remove('ok');
-    if (!silent) c?.classList.add('err');
-  }
-
-  // Persist validity in state array
-  const entry = entries.find(e => e.id === id);
-  if (entry) entry.valid = ok;
-
+  const p = parseFloat(document.getElementById('iProd').value)||0;
+  const d = parseFloat(document.getElementById('iDisp').value)||0;
+  if (!p && !d) { toast('Enter at least one non-zero quantity.','err'); ok=false; }
   return ok;
 }
+function setErr(id,msg){ document.getElementById(id).textContent=msg; }
+function clearErr(id)  { document.getElementById(id).textContent=''; }
+function clearAllErr() { ['eMachine','eProduct','eThickness'].forEach(clearErr); }
 
-/* ─────────────────────────────────────────────────────────────────
-   RESOLVED FIELD VALUES
-   Handle the "Other" free-text cases for Thickness and Colour.
-   ───────────────────────────────────────────────────────────────── */
-function resolveThick(id) {
-  const s = val(`thickness-${id}`);
-  return s === 'Other' ? val(`thick-other-${id}`) : s;
-}
-function resolveColor(id) {
-  const s = val(`color-${id}`);
-  return s === 'Other' ? val(`color-other-${id}`) : s;
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   ERROR HELPERS
-   ───────────────────────────────────────────────────────────────── */
-function setFErr(id, field, msg) {
-  const errEl = $(`fe-${field}-${id}`);
-  if (errEl) errEl.textContent = msg;
-  $(`${field}-${id}`)?.classList.add('ferr');
-}
-function clearFErr(id, field) {
-  const errEl = $(`fe-${field}-${id}`);
-  if (errEl) errEl.textContent = '';
-  $(`${field}-${id}`)?.classList.remove('ferr');
-}
-function clearAllErrors(id) {
-  ['machine','product','thickness'].forEach(f => clearFErr(id, f));
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   COUNTERS & BATCH BAR
-   ───────────────────────────────────────────────────────────────── */
-
-/** Refresh header count pill and section label count */
-function refreshCounters() {
-  const total = entries.length;
-  const valid = entries.filter(e => e.valid).length;
-
-  // Section count badge
-  $('secCount').textContent = total;
-
-  // Header pill
-  const pill = $('hdrCount');
-  if (total > 0) {
-    pill.textContent = `${valid}/${total} ready`;
-    pill.classList.add('show');
-  } else {
-    pill.classList.remove('show');
-  }
-}
-
-/** Refresh the gold batch summary bar below the cards */
-function refreshBatchBar() {
-  const valid = entries.filter(e => e.valid);
-  const bar   = $('batchBar');
-
-  if (!valid.length) { bar.classList.remove('show'); return; }
-
-  bar.classList.add('show');
-  $('bbMain').textContent = `${valid.length} entr${valid.length > 1 ? 'ies' : 'y'} ready to submit`;
-
-  // Aggregate totals across valid cards
-  let totalProd = 0, totalDisp = 0;
-  valid.forEach(e => {
-    totalProd += parseFloat(val(`prod-${e.id}`)) || 0;
-    totalDisp += parseFloat(val(`disp-${e.id}`)) || 0;
-  });
-  const date = $('batchDate').value;
-  $('bbDetail').textContent =
-    `Date: ${date}  ·  Total Prod: ${totalProd} pcs  ·  Total Disp: ${totalDisp} pcs`;
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   BUILD ENTRY OBJECT
-   Collects all field values from a card into a plain object that
-   will be sent to the Google Apps Script endpoint.
-   ───────────────────────────────────────────────────────────────── */
-function buildEntryObj(id) {
-  const machine = val(`machine-${id}`);
-  const product = val(`product-${id}`);
-  const thick   = resolveThick(id);
-  const color   = resolveColor(id);
-  const grade   = val(`grade-${id}`);
-  const prod    = parseFloat(val(`prod-${id}`)) || 0;
-  const disp    = parseFloat(val(`disp-${id}`)) || 0;
-  const factor  = CONV[`${machine}|${product}`] || null;
+// ═══════════════════════════════════════════════════════════════════
+// BUILD ENTRY OBJECT
+// ═══════════════════════════════════════════════════════════════════
+function buildEntry() {
+  const machine  = document.getElementById('sMachine').value;
+  const product  = document.getElementById('sProduct').value;
+  const thickRaw = document.getElementById('sThickness').value;
+  const thick    = thickRaw === 'Other' ? document.getElementById('iThicknessOther').value.trim() : thickRaw;
+  const colorRaw = document.getElementById('sColor').value;
+  const color    = colorRaw === 'Other' ? document.getElementById('iColorOther').value.trim() : colorRaw;
+  const prod     = parseFloat(document.getElementById('iProd').value)||0;
+  const disp     = parseFloat(document.getElementById('iDisp').value)||0;
+  const factor   = CONV[`${machine}|${product}`] || null;
 
   return {
-    date:       $('batchDate').value,
-    machine, product,
-    thickness:  thick,
-    grade, color,
-    production: prod,
-    dispatch:   disp,
+    date:      document.getElementById('entryDate').value,
+    machine, product, thickness: thick,
+    grade:     document.getElementById('sGrade').value,
+    color,
+    production: prod, dispatch: disp,
     sqftFactor: factor,
-    // Pre-computed values (informational, also used by recalcRow in the script)
-    prodSqft: factor && prod ? +(prod / factor).toFixed(4) : null,
-    dispSqft: factor && disp ? +(disp / factor).toFixed(4) : null,
-    prodSqm:  factor && prod ? +(prod / factor * SQM_PER_SQFT).toFixed(4) : null,
-    dispSqm:  factor && disp ? +(disp / factor * SQM_PER_SQFT).toFixed(4) : null,
+    prodSqft:  factor && prod ? +(prod / factor).toFixed(4) : null,
+    dispSqft:  factor && disp ? +(disp / factor).toFixed(4) : null,
+    prodSqm:   factor && prod ? +(prod / factor * SQM_PER_SQFT).toFixed(4) : null,
+    dispSqm:   factor && disp ? +(disp / factor * SQM_PER_SQFT).toFixed(4) : null,
     timestamp: new Date().toISOString()
   };
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   SUBMIT ALL
-   1. Runs full (non-silent) validation on every card.
-   2. Expands any card with an error so the user can see it.
-   3. Builds a batch array of entry objects.
-   4. Sends to Google Apps Script as { batch: [...] }.
-   5. Saves locally, resets form, refreshes log.
-   ───────────────────────────────────────────────────────────────── */
-async function submitAll() {
+// ═══════════════════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════════════════
+async function submitEntry() {
+  clearAllErr();
+  if (!validate()) return;
 
-  // ── Step 1: validate all cards (non-silent → shows red error text) ──
-  let allOk = true;
-  entries.forEach(e => {
-    clearAllErrors(e.id);
-    const ok = validateCard(e.id, false);
-    if (!ok) { allOk = false; expandCard(e.id); }
-  });
+  const entry   = buildEntry();
+  const btn     = document.getElementById('btnSubmit');
+  const scriptUrl = localStorage.getItem('hipl_url');
 
-  if (!allOk) {
-    toast('Please fix the highlighted errors before submitting.', 'err');
-    return;
-  }
+  btn.disabled   = true;
+  btn.innerHTML  = '<span class="spin"></span> Submitting…';
 
-  // ── Step 2: check at least one entry has a qty > 0 ──
-  const hasQty = entries.some(e =>
-    (parseFloat(val(`prod-${e.id}`)) || 0) > 0 ||
-    (parseFloat(val(`disp-${e.id}`)) || 0) > 0
-  );
-  if (!hasQty) {
-    toast('Enter at least one Production or Dispatch quantity.', 'err');
-    return;
-  }
+  // Save locally always
+  saveLocal(entry);
 
-  // ── Step 3: build batch payload ──
-  const batch      = entries.map(e => buildEntryObj(e.id));
-  const btn        = $('btnSubmit');
-  const scriptUrl  = localStorage.getItem('hipl_url');
-
-  btn.disabled  = true;
-  btn.innerHTML = '<span class="spin"></span> Submitting…';
-
-  // Always save locally first (ensures offline history is complete)
-  saveBatch(batch);
-
-  // ── Step 4a: no script configured ──
   if (!scriptUrl) {
-    toast('Saved locally. Configure Google Sheets to sync.', 'inf');
-    afterSubmit(btn);
+    toast('Saved locally. Configure Google Sheets to sync.','inf');
+    finishSubmit(entry, btn);
     return;
   }
 
-  // ── Step 4b: offline ──
   if (!navigator.onLine) {
-    queueOffline(batch);
-    toast('Offline — batch queued, will sync when reconnected.', 'inf');
-    afterSubmit(btn);
+    queueOffline(entry);
+    toast('Offline — queued for sync when reconnected.','inf');
+    finishSubmit(entry, btn);
     return;
   }
 
-  // ── Step 4c: send to Google Apps Script ──
-  //
-  // IMPORTANT — why mode:'no-cors' and how it works:
-  //
-  // Apps Script does NOT return CORS headers (Access-Control-Allow-Origin).
-  // A normal fetch() would be blocked by the browser with a CORS error
-  // *even if the data was written to the sheet successfully*.
-  //
-  // With mode:'no-cors':
-  //   - The browser sends the request and DOES deliver it to Google
-  //   - We get back an "opaque" response (we can't read it)
-  //   - fetch() only THROWS if there is a genuine network failure:
-  //       • No internet connection
-  //       • DNS cannot resolve script.google.com
-  //       • Request blocked by firewall / VPN
-  //   - If fetch() resolves without throwing → the request reached Google ✓
-  //
-  // Content-Type must be 'text/plain' — any other type triggers
-  // a CORS preflight (OPTIONS request) which Apps Script rejects.
   try {
     await fetch(scriptUrl, {
-      method:  'POST',
-      mode:    'no-cors',                           // opaque response — expected
-      headers: { 'Content-Type': 'text/plain' },   // simple request — no preflight
-      body:    JSON.stringify({ batch })
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(entry)
     });
-    // If we reach here, the request was sent successfully
-    toast(`✓ ${batch.length} entr${batch.length > 1 ? 'ies' : 'y'} submitted to Google Sheets!`, 'ok');
-  } catch (err) {
-    // Only reaches here on genuine network failure (no internet etc.)
-    console.error('HIPL submit error:', err.message);
-    queueOffline(batch);
-    toast('No internet connection — saved locally, will sync when back online.', 'inf');
+    toast('✓ Entry submitted to Google Sheets!','ok');
+  } catch(e) {
+    queueOffline(entry);
+    toast('Error — entry queued for retry.','err');
   }
 
-  afterSubmit(btn);
+  finishSubmit(entry, btn);
 }
 
-/** Reset state after a submit (success or offline queue) */
-function afterSubmit(btn) {
+function finishSubmit(entry, btn) {
   btn.disabled  = false;
-  btn.innerHTML = 'Submit All Entries';
+  btn.innerHTML = 'Submit Entry';
   renderLog();
-  // Reset: clear all current cards and start fresh with one blank card
-  entries = [];
-  nextId  = 0;
-  $('entryCards').innerHTML = '';
-  addEntry();
-  refreshBatchBar();
+  resetForm();
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   CLEAR ALL
-   If only 1 card: resets its fields.
-   If multiple: confirms then removes all, adds a fresh blank.
-   ───────────────────────────────────────────────────────────────── */
-function clearAll() {
-  if (entries.length === 1) { resetCard(entries[0].id); return; }
-  if (!confirm(`Clear all ${entries.length} entries?`)) return;
-  entries = [];
-  nextId  = 0;
-  $('entryCards').innerHTML = '';
-  addEntry();
-  refreshBatchBar();
+// ═══════════════════════════════════════════════════════════════════
+// LOCAL STORAGE
+// ═══════════════════════════════════════════════════════════════════
+function saveLocal(entry) {
+  const arr = JSON.parse(localStorage.getItem('hipl_entries')||'[]');
+  arr.unshift(entry);
+  if (arr.length > 60) arr.splice(60);
+  localStorage.setItem('hipl_entries', JSON.stringify(arr));
 }
 
-/** Reset an individual card to blank state without removing it */
-function resetCard(id) {
-  ['machine','product','thickness','grade','color'].forEach(f => {
-    const el = $(`${f}-${id}`);
-    if (el) { el.value = ''; }
-  });
-  $(`product-${id}`).innerHTML = '<option value="">— Select Machine First —</option>';
-  $(`product-${id}`).disabled  = true;
-  $(`prod-${id}`).value        = '';
-  $(`disp-${id}`).value        = '';
-  $(`thick-other-${id}`).style.display = 'none';
-  $(`color-other-${id}`).style.display = 'none';
-  $(`conv-${id}`).classList.remove('show');
-  card(id)?.classList.remove('ok','err');
-  entries.forEach(e => { if (e.id === id) e.valid = false; });
-  updateSummary(id);
-  refreshCounters();
-  refreshBatchBar();
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   LOCAL STORAGE
-   ───────────────────────────────────────────────────────────────── */
-
-/** Save a submitted batch to the "hipl_batches" history in localStorage */
-function saveBatch(batch) {
-  const history = JSON.parse(localStorage.getItem('hipl_batches') || '[]');
-  history.unshift({
-    submittedAt: new Date().toISOString(),
-    date:        $('batchDate').value,
-    entries:     batch
-  });
-  if (history.length > 20) history.splice(20); // keep last 20 batches
-  localStorage.setItem('hipl_batches', JSON.stringify(history));
-}
-
-/** Push a failed/offline batch onto the retry queue */
-function queueOffline(batch) {
-  const q = JSON.parse(localStorage.getItem('hipl_queue') || '[]');
-  q.push({ batch, queuedAt: new Date().toISOString() });
+function queueOffline(entry) {
+  const q = JSON.parse(localStorage.getItem('hipl_queue')||'[]');
+  q.push(entry);
   localStorage.setItem('hipl_queue', JSON.stringify(q));
 }
 
-/** Attempt to flush the offline queue when connectivity is restored */
 async function syncQueue() {
   const url = localStorage.getItem('hipl_url');
   if (!url) return;
-  const q = JSON.parse(localStorage.getItem('hipl_queue') || '[]');
+  const q = JSON.parse(localStorage.getItem('hipl_queue')||'[]');
   if (!q.length) return;
-
-  toast(`Syncing ${q.length} queued batch${q.length > 1 ? 'es' : ''}…`, 'inf');
-  const failed = [];
-
-  for (const item of q) {
+  toast(`Syncing ${q.length} queued entr${q.length>1?'ies':'y'}…`,'inf');
+  const fail = [];
+  for (const e of q) {
     try {
-      await fetch(url, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body:    JSON.stringify({ batch: item.batch })
-      });
-      // no-cors resolves without throwing = request delivered successfully
-    } catch (e) { console.error('Sync error:', e.message); failed.push(item); }
+      await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)});
+    } catch { fail.push(e); }
   }
-
-  localStorage.setItem('hipl_queue', JSON.stringify(failed));
-  const done = q.length - failed.length;
-  if (done > 0) toast(`✓ ${done} batch${done > 1 ? 'es' : ''} synced to Google Sheets!`, 'ok');
+  localStorage.setItem('hipl_queue', JSON.stringify(fail));
+  if (q.length - fail.length > 0) toast(`✓ ${q.length-fail.length} entr${q.length-fail.length>1?'ies':'y'} synced!`,'ok');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   RECENT SUBMISSIONS LOG
-   Renders the last 8 batches from localStorage into the log section.
-   Each batch shows: date, count, and a row per entry.
-   ───────────────────────────────────────────────────────────────── */
-function renderLog() {
-  const history = JSON.parse(localStorage.getItem('hipl_batches') || '[]');
-  const list    = $('logList');
+// ═══════════════════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════════════════
+function resetForm() {
+  document.getElementById('sMachine').value   = '';
+  document.getElementById('sProduct').innerHTML = '<option value="">— Select Machine First —</option>';
+  document.getElementById('sProduct').disabled  = true;
+  document.getElementById('sThickness').value  = '';
+  document.getElementById('iThicknessOther').style.display = 'none';
+  document.getElementById('iThicknessOther').value = '';
+  document.getElementById('sGrade').value   = '';
+  document.getElementById('sColor').value   = '';
+  document.getElementById('iColorOther').style.display = 'none';
+  document.getElementById('iColorOther').value  = '';
+  document.getElementById('iProd').value    = '';
+  document.getElementById('iDisp').value    = '';
+  document.getElementById('convPreview').classList.remove('show');
+  clearAllErr();
+}
 
-  if (!history.length) {
-    list.innerHTML = '<div class="log-empty">No submissions yet — submit your first batch above.</div>';
+// ═══════════════════════════════════════════════════════════════════
+// LOG
+// ═══════════════════════════════════════════════════════════════════
+function renderLog() {
+  const arr  = JSON.parse(localStorage.getItem('hipl_entries')||'[]');
+  const list = document.getElementById('logList');
+  if (!arr.length) {
+    list.innerHTML = '<div class="log-empty">No entries yet — submit your first record above.</div>';
     return;
   }
-
-  list.innerHTML = history.slice(0, 8).map(b => {
-    const d       = new Date(b.submittedAt);
-    const timeStr = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
-    const dateStr = new Date(b.date).toLocaleDateString('en-IN', {
-      weekday:'short', day:'numeric', month:'short'
-    });
-    const rows = b.entries.map(e => `
-      <div class="log-row">
-        <span class="log-machine">${e.machine.split(' ')[0]}</span>
-        <div class="log-info">
-          <b>${e.product}</b>
-          <span>${[e.thickness, e.grade, e.color].filter(Boolean).join(' · ')}</span>
-        </div>
-        <div class="log-qty">
-          <span class="lqp">↑${e.production}</span>
-          <span style="color:rgba(255,255,255,0.18)">|</span>
-          <span class="lqd">↓${e.dispatch}</span>
-        </div>
-      </div>`).join('');
-
+  list.innerHTML = arr.slice(0,12).map(e => {
+    const d   = new Date(e.timestamp);
+    const dt  = new Date(e.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+    const tm  = d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    const sub = [e.thickness, e.grade, e.color].filter(Boolean).join(' · ');
     return `
-      <div class="log-batch">
-        <div class="log-batch-hdr">
-          <span class="lbh-date">${dateStr}</span>
-          <span class="lbh-count">${b.entries.length} entr${b.entries.length > 1 ? 'ies' : 'y'}</span>
-          <span class="lbh-time">${timeStr}</span>
+      <div class="log-item">
+        <span class="log-badge">${e.machine.split(' ')[0]}</span>
+        <div class="log-info">
+          <strong>${e.product}</strong>
+          <span>${sub}</span>
         </div>
-        ${rows}
+        <div class="log-nums">
+          <span class="lp">↑${e.production}</span>
+          <span class="log-sep">|</span>
+          <span class="ld">↓${e.dispatch}</span>
+        </div>
+        <span class="log-time">${dt} ${tm}</span>
       </div>`;
   }).join('');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   SETTINGS
-   ───────────────────────────────────────────────────────────────── */
-function toggleCfg() {
-  $('cfgToggle').classList.toggle('open');
-  $('cfgPanel').classList.toggle('open');
+// ═══════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+function toggleSettings() {
+  document.getElementById('settingsToggle').classList.toggle('open');
+  document.getElementById('settingsPanel').classList.toggle('open');
 }
 function saveSettings() {
-  const url = $('scriptUrl').value.trim();
+  const url = document.getElementById('iScriptUrl').value.trim();
   localStorage.setItem('hipl_url', url);
   updateCfgStatus();
-  toast('✓ Settings saved!', 'ok');
-}
-function updateCfgStatus() {
-  const el  = $('cfgStatus');
-  const url = localStorage.getItem('hipl_url') || '';
-  el.textContent = url ? '🟢 Connected' : '🔴 Not configured';
-  el.style.color = url ? '#68D391' : '#FC8181';
+  toast('✓ Settings saved!','ok');
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   TEST CONNECTION
-   Hits the Apps Script URL with a GET request so we get a real
-   HTTP response and can tell the user exactly what went wrong.
-   ───────────────────────────────────────────────────────────────── */
-function testConnection() {
-  const url = $('scriptUrl').value.trim();
-
-  if (!url) {
-    showTestResult('error', '❌ No URL entered. Paste your Web App URL above first.');
-    return;
-  }
-  if (!url.startsWith('https://script.google.com/macros/s/')) {
-    showTestResult('error',
-      '❌ <strong>URL looks wrong.</strong><br>' +
-      'It must start with: <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:3px;">https://script.google.com/macros/s/</code><br>' +
-      'Copy it from: Apps Script → Deploy → Manage Deployments → your active deployment → the URL column.'
-    );
-    return;
-  }
-
-  const btn = $('btnTest');
-  btn.textContent = 'Testing…';
-  btn.disabled = true;
-  showTestResult('info', '🔌 Connecting to Google Apps Script via JSONP…');
-
-  // ── JSONP approach ──
-  // Regular fetch() is blocked by CORS when the page is opened as file://
-  // or from some hosting environments. JSONP works around this:
-  // we inject a <script> tag pointing to the Apps Script URL with a
-  // callback parameter. Apps Script wraps its JSON response in the
-  // callback function name, and our globally-defined function receives it.
-  // This works from file://, GitHub Pages, anywhere — no CORS restriction.
-
-  // Unique callback name to avoid conflicts if test is clicked multiple times
-  const cbName = 'hipl_test_cb_' + Date.now();
-  let timeoutId;
-
-  // Clean up: remove script tag and global callback after we're done
-  const cleanup = () => {
-    const s = $('jsonp-test-script');
-    if (s) s.remove();
-    delete window[cbName];
-    clearTimeout(timeoutId);
-    btn.textContent = '🔌 Test Connection';
-    btn.disabled = false;
-  };
-
-  // This function will be called by the script tag response
-  window[cbName] = function(data) {
-    cleanup();
-    if (data && data.status === 'ok') {
-      showTestResult('success',
-        '✅ <strong>Connection successful!</strong><br>' +
-        'Apps Script is deployed and responding correctly.<br>' +
-        'Submissions will sync to Google Sheets. You're all set!'
-      );
-    } else {
-      showTestResult('error',
-        '⚠️ <strong>Script responded but with unexpected data:</strong><br>' +
-        JSON.stringify(data) + '<br>' +
-        'Make sure you deployed the latest version of the Apps Script.'
-      );
-    }
-  };
-
-  // Timeout: if the script tag doesn't call our callback within 12s, it failed
-  timeoutId = setTimeout(() => {
-    cleanup();
-    // Check if it might be a permissions/deployment issue by opening in new tab
-    showTestResult('error',
-      '❌ <strong>No response from Apps Script (timed out)</strong><br><br>' +
-      '<strong>Step 1 — Open this URL in a new browser tab:</strong><br>' +
-      '<a href="' + url + '" target="_blank" style="color:#68D391;word-break:break-all;">' + url + '</a><br><br>' +
-      'What do you see?<br>' +
-      '&nbsp;· If it asks you to <strong>log in to Google</strong> → re-deploy with <em>"Anyone with Google Account"</em> access<br>' +
-      '&nbsp;· If it shows <strong>{"status":"ok"}</strong> → the script is fine, submission should work<br>' +
-      '&nbsp;· If it shows a <strong>Google error page</strong> → create a New Deployment and paste the new URL<br>' +
-      '&nbsp;· If it shows <strong>nothing / blank</strong> → the script code may have an error; check Apps Script editor for red error markers'
-    );
-  }, 12000);
-
-  // Inject the script tag — browser fetches it like a regular script (no CORS)
-  const script = document.createElement('script');
-  script.id  = 'jsonp-test-script';
-  script.src = url + '?callback=' + cbName;
-  script.onerror = () => {
-    cleanup();
-    showTestResult('error',
-      '❌ <strong>Could not load the Apps Script URL</strong><br><br>' +
-      'Most likely causes:<br>' +
-      '&nbsp;· The script has <strong>never been deployed</strong> as a Web App yet<br>' +
-      '&nbsp;· The deployment was deleted or the URL is outdated<br>' +
-      '&nbsp;· There is a syntax error in the Apps Script code<br><br>' +
-      '<strong>Fix:</strong> In your Google Sheet → Extensions → Apps Script → Deploy → <strong>New Deployment</strong> → Web App<br>' +
-      'Execute as: <strong>Me</strong> · Who has access: <strong>Anyone with Google Account</strong><br>' +
-      'Then copy the new URL here and save settings.'
-    );
-  };
-  document.head.appendChild(script);
-}
-
-function showTestResult(type, html) {
-  const box = $('testResult');
-  const styles = {
-    success: 'background:rgba(56,161,105,0.12);border:1px solid rgba(56,161,105,0.3);color:#9AE6B4;',
-    error:   'background:rgba(229,62,62,0.1);border:1px solid rgba(229,62,62,0.3);color:#FC8181;',
-    info:    'background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.25);color:#F5A623;'
-  };
-  box.style.cssText = styles[type] + 'display:block;border-radius:7px;padding:11px 14px;font-size:12px;line-height:1.8;margin-top:2px;';
-  box.innerHTML = html;
-}
-
-/* ─────────────────────────────────────────────────────────────────
-   TOAST NOTIFICATIONS
-   type: 'ok' (green) | 'err' (red) | 'inf' (gold pulsing)
-   Auto-dismiss after 3.8 s with a fade-out.
-   ───────────────────────────────────────────────────────────────── */
-function toast(msg, type = 'ok') {
-  const wrap = $('toastWrap');
+// ═══════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════
+function toast(msg, type='ok') {
+  const wrap = document.getElementById('toastWrap');
   const el   = document.createElement('div');
   el.className = `toast ${type}`;
   el.innerHTML = `<div class="t-dot"></div><span>${msg}</span>`;
   wrap.appendChild(el);
-  setTimeout(() => {
-    el.style.opacity    = '0';
-    el.style.transition = 'opacity .3s';
-    setTimeout(() => el.remove(), 300);
-  }, 3800);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 3600);
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   MODAL — Google Apps Script viewer
-   ───────────────────────────────────────────────────────────────── */
-function openModal()  { $('scriptPre').textContent = APPS_SCRIPT; $('scriptModal').classList.add('open'); }
-function closeModal() { $('scriptModal').classList.remove('open'); }
+// ═══════════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════════
+function openModal()  {
+  document.getElementById('scriptPre').textContent = APPS_SCRIPT;
+  document.getElementById('scriptModal').classList.add('open');
+}
+function closeModal() { document.getElementById('scriptModal').classList.remove('open'); }
 function copyScript() {
-  navigator.clipboard.writeText(APPS_SCRIPT)
-    .then(() => toast('✓ Script copied to clipboard!', 'ok'));
+  navigator.clipboard.writeText(APPS_SCRIPT).then(()=>toast('✓ Script copied!','ok'));
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   GOOGLE APPS SCRIPT
-   ───────────────────────────────────────────────────────────────────
-   Paste this into: Google Sheet → Extensions → Apps Script
-   Then: Deploy → New Deployment → Web App
-         Execute as: Me
-         Who has access: Anyone with Google Account
-   Copy the Web App URL into the Settings panel in this app.
-   ═══════════════════════════════════════════════════════════════════ */
-const APPS_SCRIPT = `// ══════════════════════════════════════════════════════════════
-// HIPL Production & Dispatch Tracker — Google Apps Script v3
-// ──────────────────────────────────────────────────────────────
-// DEPLOYMENT:
-//   Extensions → Apps Script → Paste → Save → Deploy → New Deployment → Web App
-//   Execute as: Me  |  Who has access: Anyone with Google Account
-// ══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// GOOGLE APPS SCRIPT
+// ═══════════════════════════════════════════════════════════════════
+const APPS_SCRIPT = `// ══════════════════════════════════════════════════════════════════
+// HIPL Production & Dispatch Tracker — Google Apps Script
+// ── Deploy as Web App ──
+//    Execute as: Me
+//    Who has access: Anyone with a Google Account
+// ══════════════════════════════════════════════════════════════════
 
-// ── Column index constants (1-based, for Google Sheets) ─────────
+// Column positions (1-indexed)
 const COL = {
-  MACHINE:   1,  // A — Machine Name
-  PRODUCT:   2,  // B — Product
-  THICKNESS: 3,  // C — Thickness
-  GRADE:     4,  // D — Grade
-  COLOR:     5,  // E — Colour
-  OPENING:   6,  // F — Opening Stock
-  // Columns 7+ = date pairs (Prod at G/I/K…, Disp at H/J/L…)
-  // Last 5 columns always = TP | TD | Closing | Sq.Ft. | Sq.Mtr.
+  MACHINE:   1,
+  PRODUCT:   2,
+  THICKNESS: 3,
+  GRADE:     4,
+  COLOR:     5,
+  OPENING:   6,
+  // Date pairs start at col 7 (Prod at odd cols, Disp at even cols)
+  // TP, TD, CLOSING, SQFT, SQMTR are the last 5 columns
 };
 
-const TOTAL_COLS      = 5;  // TP, TD, Closing, Sq.Ft., Sq.Mtr. — always last
-const FIRST_DATE_COL  = 7;  // Date-pair columns begin here
-
-// Insertion sort order for machines
 const MACHINE_ORDER = ['Apollo','Parijatha PBM+','Rubber Mould','Columbia','Other'];
+const MONTH_NAMES   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Sheet tab naming: Jan-26, Feb-26, etc.
-const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun',
-                     'Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// ── HTTP Handlers ────────────────────────────────────────────────
-
-/**
- * doPost
- * Receives a JSON body posted as text/plain (to avoid CORS preflight).
- * The body is still valid JSON — we parse e.postData.contents directly.
- * Accepts both { batch: [...entries] } and a single entry object.
- * A ScriptLock prevents concurrent write conflicts from multiple users.
- */
+// ── HTTP HANDLERS ────────────────────────────────────────────────
 function doPost(e) {
   const lock = LockService.getScriptLock();
-  lock.waitLock(15000);
+  lock.waitLock(10000);
   try {
-    const payload  = JSON.parse(e.postData.contents);
-    const entries  = payload.batch ? payload.batch : [payload];
-    const results  = entries.map(entry => processEntry(entry));
-    return jsonResp({ status:'ok', processed: results.length, results });
+    const data   = JSON.parse(e.postData.contents);
+    const result = processEntry(data);
+    return json(result);
   } catch(err) {
-    return jsonResp({ status:'error', message: err.toString() });
+    return json({status:'error', message: err.toString()});
   } finally {
     lock.releaseLock();
   }
 }
 
-/** doGet: health check + JSONP support for the Test Connection button.
- *  When called with ?callback=fnName, wraps response in fnName({...})
- *  so the browser can receive it cross-origin without CORS restrictions.
- */
 function doGet(e) {
-  const data     = { status: 'ok', app: 'HIPL Tracker', version: '3.0' };
-  const callback = e && e.parameter && e.parameter.callback;
-  if (callback) {
-    // JSONP response — wrap JSON in the callback function name
-    return ContentService
-      .createTextOutput(callback + '(' + JSON.stringify(data) + ')')
-      .setMimeType(ContentService.MimeType.JAVASCRIPT);
-  }
-  return jsonResp(data);
+  return json({status:'ok', app:'HIPL Tracker', version:'2.0'});
 }
 
-function jsonResp(obj) {
-  // Add CORS headers so the browser can read the response from our fetch() call
+function json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/** doOptions: handle CORS preflight if browser sends one */
-function doOptions(e) {
-  return ContentService.createTextOutput('')
-    .setMimeType(ContentService.MimeType.TEXT);
-}
-
-// ── Core: Process One Entry ──────────────────────────────────────
-
-/**
- * processEntry
- * 1. Finds or creates the correct monthly sheet.
- * 2. Ensures a date column pair exists for data.date.
- * 3. Finds or creates a data row matching the 5-field key.
- * 4. Writes Prod / Disp values (overwrite mode).
- * 5. Recalculates TP, TD, Closing, Sq.Ft., Sq.Mtr. for that row.
- */
+// ── MAIN LOGIC ───────────────────────────────────────────────────
 function processEntry(data) {
   const ss   = SpreadsheetApp.getActiveSpreadsheet();
   const date = new Date(data.date);
 
-  // 1. Monthly sheet
-  const sheetName = getSheetName(date);
+  // Get or create monthly sheet
+  const sheetName = MONTH_NAMES[date.getMonth()] + '-' + String(date.getFullYear()).slice(2);
   let sheet = ss.getSheetByName(sheetName);
-  if (!sheet) sheet = createMonthlySheet(ss, sheetName, date);
 
-  // 2. Date columns
-  const { prod: prodCol, disp: dispCol } = getOrCreateDateColumn(sheet, date);
+  if (!sheet) {
+    sheet = createMonthlySheet(ss, sheetName, date);
+  }
 
-  // 3. Find or create data row
+  // Ensure date column exists
+  const dateCols = getOrCreateDateColumn(sheet, date);
+  const prodCol  = dateCols.prod;
+  const dispCol  = dateCols.disp;
+
+  // Find or create data row
   const rowIdx = findRow(sheet, data);
 
   if (rowIdx > 0) {
-    // Overwrite existing Prod/Disp for this date
+    // Row exists — overwrite prod/disp for this date (as per spec)
     if (data.production > 0) sheet.getRange(rowIdx, prodCol).setValue(data.production);
     if (data.dispatch   > 0) sheet.getRange(rowIdx, dispCol).setValue(data.dispatch);
-    recalcRow(sheet, rowIdx);
-    return { status:'updated', row:rowIdx, sheet:sheetName };
+    recalcTotals(sheet, rowIdx);
+    return {status:'updated', row:rowIdx, sheet:sheetName};
   } else {
-    // Insert new row at sorted position
-    const insertAt = findInsertPos(sheet, data);
+    // New row — insert in sorted position
+    const insertAt = findInsertRow(sheet, data);
     sheet.insertRowBefore(insertAt);
 
-    sheet.getRange(insertAt, COL.MACHINE).setValue(data.machine    || '');
-    sheet.getRange(insertAt, COL.PRODUCT).setValue(data.product    || '');
+    sheet.getRange(insertAt, COL.MACHINE).setValue(data.machine);
+    sheet.getRange(insertAt, COL.PRODUCT).setValue(data.product);
     sheet.getRange(insertAt, COL.THICKNESS).setValue(data.thickness || '');
-    sheet.getRange(insertAt, COL.GRADE).setValue(data.grade        || '');
-    sheet.getRange(insertAt, COL.COLOR).setValue(data.color        || '');
+    sheet.getRange(insertAt, COL.GRADE).setValue(data.grade || '');
+    sheet.getRange(insertAt, COL.COLOR).setValue(data.color || '');
     sheet.getRange(insertAt, COL.OPENING).setValue(0);
 
     sheet.getRange(insertAt, prodCol).setValue(data.production || 0);
     sheet.getRange(insertAt, dispCol).setValue(data.dispatch   || 0);
 
-    recalcRow(sheet, insertAt);
-    styleDataRow(sheet, insertAt);
-    return { status:'created', row:insertAt, sheet:sheetName };
+    // Re-get date col index in case insert shifted things — re-fetch
+    recalcTotals(sheet, insertAt);
+    return {status:'created', row:insertAt, sheet:sheetName};
   }
 }
 
-// ── Row Search ───────────────────────────────────────────────────
-
-/**
- * findRow: scans rows 3+ for a row where all 5 key fields match.
- * Comparison is case-insensitive and whitespace-trimmed.
- * Returns 1-based row index or -1 if not found.
- */
+// ── ROW MATCHING ─────────────────────────────────────────────────
 function findRow(sheet, data) {
   const last = sheet.getLastRow();
   if (last < 3) return -1;
+
   const vals = sheet.getRange(3, 1, last - 2, 5).getValues();
   for (let i = 0; i < vals.length; i++) {
     if (
       norm(vals[i][0]) === norm(data.machine)    &&
       norm(vals[i][1]) === norm(data.product)    &&
       norm(vals[i][2]) === norm(data.thickness)  &&
-      norm(vals[i][3]) === norm(data.grade || '') &&
-      norm(vals[i][4]) === norm(data.color || '')
+      norm(vals[i][3]) === norm(data.grade||'')  &&
+      norm(vals[i][4]) === norm(data.color||'')
     ) return i + 3;
   }
   return -1;
 }
 
-const norm = s => String(s || '').trim().toLowerCase();
+function norm(s) { return String(s||'').trim().toLowerCase(); }
 
-// ── Insert Position ──────────────────────────────────────────────
-
-/**
- * findInsertPos: find where to insert a new row.
- * Sort order: machine order index first, then product name alphabetically.
- */
-function findInsertPos(sheet, data) {
+// ── INSERT POSITION (sorted by Machine order, then Product alpha) ─
+function findInsertRow(sheet, data) {
   const last = sheet.getLastRow();
   if (last < 3) return 3;
+
   const vals = sheet.getRange(3, 1, last - 2, 2).getValues();
-  const newMi = machIdx(data.machine);
+  const mi   = machineIdx(data.machine);
+
   for (let i = 0; i < vals.length; i++) {
-    const rowMi = machIdx(String(vals[i][0]));
-    if (rowMi > newMi) return i + 3;
-    if (rowMi === newMi && norm(String(vals[i][1])) > norm(data.product)) return i + 3;
+    const rm = machineIdx(String(vals[i][0]));
+    if (rm > mi) return i + 3;
+    if (rm === mi && norm(vals[i][1]) > norm(data.product)) return i + 3;
   }
   return last + 1;
 }
 
-function machIdx(m) { const i = MACHINE_ORDER.indexOf(m); return i === -1 ? 99 : i; }
+function machineIdx(m) {
+  const idx = MACHINE_ORDER.indexOf(m);
+  return idx === -1 ? 99 : idx;
+}
 
-// ── Date Columns ─────────────────────────────────────────────────
-
-/**
- * getOrCreateDateColumn
- * Finds an existing Prod column for the given date, or inserts a new
- * Prod|Disp pair just before the trailing summary columns.
- * Returns { prod: colIdx, disp: colIdx+1 }.
- */
+// ── DATE COLUMNS ─────────────────────────────────────────────────
 function getOrCreateDateColumn(sheet, date) {
   const lastCol = sheet.getLastColumn();
-  if (lastCol < FIRST_DATE_COL) return insertDateCols(sheet, date);
+  if (lastCol < 1) return setupNewDateCol(sheet, date);
 
-  const row1   = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const target = date.toDateString();
+  // Row 1 has date values in date-pair columns starting at col 7
+  const row1 = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const tgt  = date.toDateString();
 
-  for (let c = FIRST_DATE_COL; c <= lastCol - TOTAL_COLS; c += 2) {
+  for (let c = 7; c <= lastCol; c += 2) {
     const cell = row1[c - 1];
-    if (cell instanceof Date && cell.toDateString() === target) return { prod:c, disp:c+1 };
+    if (cell instanceof Date && cell.toDateString() === tgt) {
+      return {prod: c, disp: c + 1};
+    }
   }
-  return insertDateCols(sheet, date);
+  return setupNewDateCol(sheet, date);
 }
 
-function insertDateCols(sheet, date) {
-  const lastCol  = sheet.getLastColumn();
-  const at       = lastCol - TOTAL_COLS + 1; // before TP
+function setupNewDateCol(sheet, date) {
+  // Find the last Prod column (date columns), insert before totals (last 5 cols)
+  const lastCol = sheet.getLastColumn();
+  // Totals are last 5 cols: TP, TD, Closing, Sq.Ft, Sq.Mtr
+  const TOTAL_COLS = 5;
+  const insertAt   = lastCol - TOTAL_COLS + 1;
 
-  sheet.insertColumnsBefore(at, 2);
+  sheet.insertColumnsBefore(insertAt, 2);
 
-  // Merge date header across Prod+Disp columns
-  const dateHdr = sheet.getRange(1, at, 1, 2);
-  dateHdr.merge();
-  dateHdr.setValue(date);
-  dateHdr.setNumberFormat('dd-mmm-yy');
-  dateHdr.setHorizontalAlignment('center');
-  styleHdr(dateHdr, '#2D3B52', '#F5A623');
+  // Set date header spanning Prod+Disp
+  sheet.getRange(1, insertAt).setValue(date);
+  sheet.getRange(1, insertAt).setNumberFormat('dd-mmm-yy');
+  sheet.getRange(1, insertAt, 1, 2).merge();
+  sheet.getRange(1, insertAt).setHorizontalAlignment('center');
 
-  // Sub-headers
-  styleHdr(sheet.getRange(2, at),   '#1E2A3A', '#68D391');
-  styleHdr(sheet.getRange(2, at+1), '#1E2A3A', '#FC8181');
-  sheet.getRange(2, at).setValue('Prod');
-  sheet.getRange(2, at+1).setValue('Disp');
-  sheet.setColumnWidth(at,   70);
-  sheet.setColumnWidth(at+1, 70);
+  sheet.getRange(2, insertAt).setValue('Prod');
+  sheet.getRange(2, insertAt + 1).setValue('Disp');
 
-  return { prod:at, disp:at+1 };
+  // Style header cells
+  const hdrFmt = {
+    background: '#2D3748', fontColor: '#F5A623',
+    bold: true, fontSize: 10, halign: 'center'
+  };
+  styleCell(sheet.getRange(1, insertAt), hdrFmt);
+  styleCell(sheet.getRange(2, insertAt),   {background:'#2D3748', fontColor:'#68D391', bold:true, halign:'center'});
+  styleCell(sheet.getRange(2, insertAt+1), {background:'#2D3748', fontColor:'#FC8181', bold:true, halign:'center'});
+
+  return {prod: insertAt, disp: insertAt + 1};
 }
 
-// ── Recalculate Row Totals ────────────────────────────────────────
+function styleCell(range, opts) {
+  if (opts.background) range.setBackground(opts.background);
+  const font = SpreadsheetApp.newTextStyle();
+  if (opts.fontColor) font.setForegroundColor(opts.fontColor);
+  if (opts.bold)      font.setBold(true);
+  if (opts.fontSize)  font.setFontSize(opts.fontSize);
+  range.setTextStyle(font.build());
+  if (opts.halign)    range.setHorizontalAlignment(opts.halign);
+}
 
-/**
- * recalcRow
- * Sums all Prod and Disp values across all date columns for a row.
- * Writes TP, TD, Closing = Opening + TP - TD.
- * If a conversion factor exists, also writes Sq.Ft. and Sq.Mtr.
- */
-function recalcRow(sheet, rowIdx) {
-  const lastCol  = sheet.getLastColumn();
-  const pairLen  = lastCol - FIRST_DATE_COL - TOTAL_COLS + 1;
-  if (pairLen <= 0) return;
+// ── RECALC TOTALS ────────────────────────────────────────────────
+function recalcTotals(sheet, rowIdx) {
+  const lastCol    = sheet.getLastColumn();
+  const TOTAL_COLS = 5; // TP, TD, Closing, Sq.Ft, Sq.Mtr
+  const firstDate  = 7; // date pairs start here
 
-  const rowVals = sheet.getRange(rowIdx, FIRST_DATE_COL, 1, pairLen).getValues()[0];
+  // Sum all prod cols and disp cols
   let tp = 0, td = 0;
+  const rowVals = sheet.getRange(rowIdx, firstDate, 1, lastCol - firstDate - TOTAL_COLS + 1).getValues()[0];
+
   for (let i = 0; i < rowVals.length; i += 2) {
-    tp += Number(rowVals[i])     || 0;
-    td += Number(rowVals[i + 1]) || 0;
+    tp += Number(rowVals[i])   || 0;
+    td += Number(rowVals[i+1]) || 0;
   }
 
   const opening  = Number(sheet.getRange(rowIdx, COL.OPENING).getValue()) || 0;
   const closing  = opening + tp - td;
 
-  // Positions of trailing summary columns
   const tpCol      = lastCol - TOTAL_COLS + 1;
   const tdCol      = tpCol + 1;
   const closingCol = tpCol + 2;
@@ -2062,79 +1266,27 @@ function recalcRow(sheet, rowIdx) {
   sheet.getRange(rowIdx, tdCol).setValue(td);
   sheet.getRange(rowIdx, closingCol).setValue(closing);
 
-  // Sq. Ft. / Sq. Mtr. — based on closing stock and conversion factor
-  const machine = sheet.getRange(rowIdx, COL.MACHINE).getValue();
-  const product = sheet.getRange(rowIdx, COL.PRODUCT).getValue();
-  const factor  = CONV_FACTORS[machine + '|' + product];
-  if (factor && closing >= 0) {
-    const sqft = closing / factor;
-    sheet.getRange(rowIdx, sqftCol).setValue(+sqft.toFixed(4));
-    sheet.getRange(rowIdx, sqmCol).setValue(+(sqft * 0.092903).toFixed(4));
-  }
-  // No factor → leave Sq.Ft. and Sq.Mtr. blank
+  // Sq ft / Sq mtr — read factor from a named range or compute from closing stock
+  // We store sqftFactor in a helper sheet if available
+  // For now, Sq.Ft. and Sq.Mtr. are left to be set manually or via lookup
+  // (Factor data not stored in sheet — handled client-side in the app)
 }
 
-// ── Conversion factors (mirrors the frontend CONV object exactly) ─
-const CONV_FACTORS = {
-  'Apollo|Hexagon':              2.50,
-  'Apollo|8x8 Quad':             2.25,
-  'Apollo|8x4':                  4.50,
-  'Apollo|Kerbstone Round':      1.00,
-  'Apollo|Kerbstone Chamfered':  1.00,
-  'Apollo|Kerbstone Bullnose':   1.00,
-  'Parijatha PBM+|Hexagon':      2.50,
-  'Parijatha PBM+|Zigzag':       3.50,
-  'Parijatha PBM+|I-Shape':      3.25,
-  'Parijatha PBM+|8x4':          4.50,
-  'Parijatha PBM+|Tricon':       2.90,
-  'Parijatha PBM+|S-Paver':      4.50,
-  'Rubber Mould|Jumbo':          1.80,
-  'Rubber Mould|Zigzag':         2.80,
-  'Rubber Mould|Euphrates':      2.50,
-  'Rubber Mould|River Quad':     2.25,
-  'Rubber Mould|3D Hexa':        2.50,
-  'Rubber Mould|Cobble':         2.25,
-  'Rubber Mould|8x4':            4.50,
-  'Rubber Mould|4x4':            9.00,
-  'Rubber Mould|Cobble 4.5"':    7.11,
-  'Rubber Mould|X-Block':        1.44,
-  'Rubber Mould|36 Striker':     1.00,
-  'Rubber Mould|Cross Strip':    1.00,
-  'Rubber Mould|Matrix':         1.00,
-  'Rubber Mould|BB Bali':        2.25,
-  'Rubber Mould|BB Aruba':       2.25,
-  'Rubber Mould|BB Maui':        2.25,
-  'Rubber Mould|BB Maldives':    2.25,
-  'Rubber Mould|BB Ibiza':       2.25,
-  'Rubber Mould|BB Barbados':    2.25,
-  'Rubber Mould|Cool Roof Tile': 1.00,
-  'Rubber Mould|Drain Channel':  1.00,
-};
-
-// ── Monthly Sheet Management ──────────────────────────────────────
-
-/** Returns the sheet name for a date, e.g. "Feb-26" */
-function getSheetName(date) {
-  return MONTH_NAMES[date.getMonth()] + '-' + String(date.getFullYear()).slice(2);
-}
-
-/**
- * createMonthlySheet
- * Inserts a new sheet at position 0 (leftmost tab).
- * If a previous month's sheet exists, copies all rows and carries
- * Closing Stock → Opening Stock for the new month.
- * If no previous month, sets up blank headers only.
- */
+// ── CREATE MONTHLY SHEET ─────────────────────────────────────────
 function createMonthlySheet(ss, sheetName, date) {
-  const newSheet  = ss.insertSheet(sheetName, 0);
-  const prevName  = getPrevMonthName(date);
-  const prevSheet = ss.getSheetByName(prevName);
+  // Insert at position 0 (leftmost)
+  const newSheet = ss.insertSheet(sheetName, 0);
+
+  // Try to copy Opening Stock from previous month's Closing Stock
+  const prevMonthName = getPrevMonthName(date);
+  const prevSheet     = ss.getSheetByName(prevMonthName);
 
   if (prevSheet) {
-    copyFromPrevMonth(newSheet, prevSheet);
+    copyFromPreviousMonth(newSheet, prevSheet);
   } else {
-    setupHeaders(newSheet);
+    setupBlankSheetHeaders(newSheet);
   }
+
   return newSheet;
 }
 
@@ -2143,94 +1295,85 @@ function getPrevMonthName(date) {
   return MONTH_NAMES[d.getMonth()] + '-' + String(d.getFullYear()).slice(2);
 }
 
-/**
- * copyFromPrevMonth
- * Copies every data row from the previous month's sheet.
- * Sets Opening Stock = previous month's Closing Stock for each row.
- * All rows are copied regardless of their closing stock value.
- */
-function copyFromPrevMonth(newSheet, prevSheet) {
-  const prevLast    = prevSheet.getLastRow();
+function copyFromPreviousMonth(newSheet, prevSheet) {
+  const prevLast   = prevSheet.getLastRow();
   const prevLastCol = prevSheet.getLastColumn();
-  setupHeaders(newSheet);
-  if (prevLast < 3) return;
+  if (prevLast < 3) { setupBlankSheetHeaders(newSheet); return; }
 
-  const rowCount  = prevLast - 2;
-  const idCols    = prevSheet.getRange(3, 1, rowCount, 6).getValues();
+  // Setup headers on new sheet
+  setupBlankSheetHeaders(newSheet);
 
-  // Closing is at prevLastCol - TOTAL_COLS + 3 (= TP, TD, Closing, SqFt, SqMtr)
-  const closingCol = prevLastCol - TOTAL_COLS + 3;
-  let closingVals  = [];
-  if (closingCol >= 1 && closingCol <= prevLastCol) {
-    closingVals = prevSheet.getRange(3, closingCol, rowCount, 1)
-      .getValues().map(r => Number(r[0]) || 0);
+  // Read all data rows from previous sheet (row 3 onwards)
+  const TOTAL_COLS  = 5;
+  const dataRows    = prevSheet.getRange(3, 1, prevLast - 2, Math.min(6, prevLastCol)).getValues();
+  const closingCol  = prevLastCol - TOTAL_COLS + 3; // TP, TD, Closing...
+
+  // Get closing stock column from previous sheet
+  let closingVals = [];
+  if (closingCol > 0 && closingCol <= prevLastCol) {
+    closingVals = prevSheet.getRange(3, closingCol, prevLast - 2, 1).getValues().map(r => r[0]);
   }
 
-  for (let i = 0; i < rowCount; i++) {
-    const row     = i + 3;
-    const id      = idCols[i];
-    const opening = closingVals[i] !== undefined ? closingVals[i] : 0;
+  // Write all rows to new sheet
+  for (let i = 0; i < dataRows.length; i++) {
+    const r      = dataRows[i];
+    const rowNum = i + 3;
 
-    newSheet.getRange(row, COL.MACHINE).setValue(id[0]    || '');
-    newSheet.getRange(row, COL.PRODUCT).setValue(id[1]    || '');
-    newSheet.getRange(row, COL.THICKNESS).setValue(id[2]  || '');
-    newSheet.getRange(row, COL.GRADE).setValue(id[3]      || '');
-    newSheet.getRange(row, COL.COLOR).setValue(id[4]      || '');
-    newSheet.getRange(row, COL.OPENING).setValue(opening); // ← carry-forward
+    newSheet.getRange(rowNum, COL.MACHINE).setValue(r[0]   || '');
+    newSheet.getRange(rowNum, COL.PRODUCT).setValue(r[1]   || '');
+    newSheet.getRange(rowNum, COL.THICKNESS).setValue(r[2] || '');
+    newSheet.getRange(rowNum, COL.GRADE).setValue(r[3]     || '');
+    newSheet.getRange(rowNum, COL.COLOR).setValue(r[4]     || '');
+
+    const opening = closingVals.length > i ? (Number(closingVals[i]) || 0) : 0;
+    newSheet.getRange(rowNum, COL.OPENING).setValue(opening);
   }
-  styleDataRows(newSheet, 3, rowCount);
+
+  // Format data area
+  if (dataRows.length > 0) {
+    applyDataFormatting(newSheet, 3, dataRows.length);
+  }
 }
 
-// ── Formatting ───────────────────────────────────────────────────
+function setupBlankSheetHeaders(sheet) {
+  // Row 1: Title / Date headers
+  const headers2 = ['Machine Name','Product','Thickness','Grade','Colour','Opening','TP','TD','Closing','Sq. Ft.','Sq. Mtr.'];
 
-/**
- * setupHeaders: writes row 2 fixed-column headers + trailing summary headers.
- * Sets column widths and freezes first 2 rows + 6 columns.
- */
-function setupHeaders(sheet) {
-  const fixed   = ['Machine Name','Product','Thickness','Grade','Colour','Opening'];
-  const summary = ['TP','TD','Closing','Sq. Ft.','Sq. Mtr.'];
-
-  fixed.forEach((h,i) => {
-    const c = sheet.getRange(2, i+1);
-    c.setValue(h); styleHdr(c, '#111923', '#F5A623');
-  });
-  summary.forEach((h,i) => {
-    const c = sheet.getRange(2, 7+i);
-    c.setValue(h); styleHdr(c, '#111923', '#F5A623');
+  // Write row 2 headers for fixed cols
+  headers2.slice(0,6).forEach((h,i) => {
+    const cell = sheet.getRange(2, i+1);
+    cell.setValue(h);
+    styleCell(cell, {background:'#1A2332', fontColor:'#F5A623', bold:true, halign:'center'});
   });
 
-  sheet.setColumnWidth(1, 145);  // Machine
-  sheet.setColumnWidth(2, 145);  // Product
-  sheet.setColumnWidth(3,  90);  // Thickness
-  sheet.setColumnWidth(4,  70);  // Grade
-  sheet.setColumnWidth(5,  95);  // Colour
-  sheet.setColumnWidth(6,  80);  // Opening
+  // Totals headers at end
+  const totalHeaders = ['TP','TD','Closing','Sq. Ft.','Sq. Mtr.'];
+  totalHeaders.forEach((h,i) => {
+    const cell = sheet.getRange(2, 7 + i);
+    cell.setValue(h);
+    styleCell(cell, {background:'#1A2332', fontColor:'#F5A623', bold:true, halign:'center'});
+  });
 
+  // Column widths
+  sheet.setColumnWidth(1, 140); // Machine
+  sheet.setColumnWidth(2, 140); // Product
+  sheet.setColumnWidth(3, 90);  // Thickness
+  sheet.setColumnWidth(4, 70);  // Grade
+  sheet.setColumnWidth(5, 90);  // Colour
+  sheet.setColumnWidth(6, 80);  // Opening
+
+  // Freeze first 6 columns and 2 header rows
   sheet.setFrozenRows(2);
   sheet.setFrozenColumns(6);
 }
 
-function styleHdr(range, bg, fg) {
-  range.setBackground(bg);
-  range.setFontColor(fg);
-  range.setFontWeight('bold');
-  range.setHorizontalAlignment('center');
-}
-
-/** Alternating row background shading for a block of data rows */
-function styleDataRows(sheet, startRow, count) {
+function applyDataFormatting(sheet, startRow, count) {
+  // Alternate row shading for readability
   for (let i = 0; i < count; i++) {
-    const bg = i % 2 === 0 ? '#1E2A3A' : '#243044';
-    sheet.getRange(startRow + i, 1, 1, Math.max(sheet.getLastColumn(), 11)).setBackground(bg);
+    const row = startRow + i;
+    const bg  = i % 2 === 0 ? '#1E2A3A' : '#243044';
+    sheet.getRange(row, 1, 1, sheet.getLastColumn()).setBackground(bg);
   }
-}
-
-/** Shade a single newly-inserted data row */
-function styleDataRow(sheet, rowIdx) {
-  const idx = rowIdx - 3;
-  const bg  = idx % 2 === 0 ? '#1E2A3A' : '#243044';
-  sheet.getRange(rowIdx, 1, 1, sheet.getLastColumn()).setBackground(bg);
 }`;
 </script>
 </body>
