@@ -3,7 +3,7 @@
 // Provides offline caching and background sync capability.
 // ══════════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'hipl-v3';
+const CACHE_NAME = 'hipl-v4';
 
 // Files to pre-cache on install (the full app shell)
 const PRECACHE = [
