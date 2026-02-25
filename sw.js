@@ -1,5 +1,5 @@
-// HIPL Tracker v2 — Service Worker
-const CACHE = 'hipl-v2';
+// HIPL Tracker v4 — Service Worker
+const CACHE  = 'hipl-v4';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
@@ -18,7 +18,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method === 'POST') {
     e.respondWith(
       fetch(e.request).catch(() =>
-        new Response(JSON.stringify({status:'queued'}), {headers:{'Content-Type':'application/json'}})
+        new Response(JSON.stringify({ status:'queued' }), { headers:{ 'Content-Type':'application/json' } })
       )
     );
     return;
@@ -41,7 +41,7 @@ self.addEventListener('sync', e => {
   if (e.tag === 'sync-hipl') {
     e.waitUntil(
       self.clients.matchAll().then(clients =>
-        clients.forEach(c => c.postMessage({type:'SYNC_NOW'}))
+        clients.forEach(c => c.postMessage({ type:'SYNC_NOW' }))
       )
     );
   }
